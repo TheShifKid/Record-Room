@@ -624,7 +624,7 @@ function merge(local, remote){
   local.deleted = del; return local;
 }
 async function getRemote(){
-  const r = await fetch(SYNC_URL+SYNC.id, {headers:{"Security-key":SYNC.key}, cache:"no-store"});
+  const r = await fetch(SYNC_URL+SYNC.id+"?t="+Date.now(), {headers:{"Security-key":SYNC.key}, cache:"no-store"});
   if (!r.ok) throw new Error("get "+r.status);
   return cleanJSON(await r.text());
 }
@@ -947,6 +947,6 @@ $("#dlBtn") && $("#dlBtn").addEventListener("click", ()=>{
   }catch(e){ toast("Couldn't save a copy here"); }
 });
 render();
-syncUI(); pull();
+syncUI(); pull(); setTimeout(pull, 6000);
 })();
 </script></body></html>
