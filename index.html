@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Shahaf's Vinyl Shelf</title><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"><style id="css">:root{--ink:#f6ecdc;--muted:#b3a58f;--brass:#d9a441;--brass2:#a8761f;--wall:#1a1512;--s:150px;--gap:26px;--plank:26px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--wall)}
+body{color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;min-height:100vh;line-height:1.45;
+  background:
+    radial-gradient(700px 420px at 50% -60px,rgba(255,196,120,.22),transparent 70%),
+    radial-gradient(500px 300px at 10% 40%,rgba(255,120,80,.06),transparent 70%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0 2px,transparent 2px 7px),
+    linear-gradient(#211a16,#120e0c)}
+.room{max-width:1120px;margin:0 auto;padding:30px 16px 100px}
+.top{text-align:center;padding:10px 0 22px}
+.neon{font-family:Fraunces,serif;font-weight:900;font-size:clamp(34px,8vw,68px);line-height:1;letter-spacing:-.01em;color:#fff3e0;
+  text-shadow:0 0 6px rgba(255,170,90,.9),0 0 22px rgba(255,120,60,.6),0 0 48px rgba(255,90,40,.35);animation:flick 7s infinite}
+.neon span{font-style:italic;font-weight:400;color:#ffd9a0;display:inline-block}
+@keyframes flick{0%,92%,100%{opacity:1}93%{opacity:.75}94%{opacity:1}96%{opacity:.85}}
+.tag{color:var(--muted);font-size:13px;margin-top:10px;letter-spacing:.04em}
+.counts{display:inline-flex;gap:10px;margin-top:14px;font-size:13px;color:var(--muted);background:rgba(0,0,0,.3);border:1px solid #3b2f25;padding:7px 14px;border-radius:999px}
+.counts b{color:var(--ink);font-size:15px}.dot{opacity:.5}
+.plates{position:sticky;top:0;z-index:8;display:flex;justify-content:center;gap:8px;padding:12px 4px;margin:0 -16px;background:linear-gradient(#18120f,rgba(24,18,15,.85));backdrop-filter:blur(8px);overflow-x:auto}
+.plate{flex:none;font:700 13px "Space Grotesk",system-ui,-apple-system,sans-serif;letter-spacing:.03em;color:#2a1c08;cursor:pointer;border:0;padding:10px 16px;border-radius:8px;
+  background:linear-gradient(180deg,#f3d48a,#c99434 55%,#a8761f);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 3px 0 #6e4c14,0 6px 14px rgba(0,0,0,.4);opacity:.55;transition:.2s}
+.plate.on{opacity:1;transform:translateY(-1px)}
+.plate:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 0 #6e4c14}
+.tools{display:flex;gap:10px;align-items:center;margin:16px auto 22px;max-width:620px}
+input,select{font:500 15px "Space Grotesk",system-ui,-apple-system,sans-serif;color:var(--ink);background:rgba(0,0,0,.35);border:1px solid #4a3a2c;border-radius:12px;padding:12px 14px;width:100%}
+input:focus{outline:none;border-color:var(--brass)}
+.save{font-size:12px;color:var(--muted);white-space:nowrap}
+
+/* ---------- the shelf unit ---------- */
+.unit{position:relative;border-radius:10px;padding:18px 18px 0;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.55),transparent 8%,transparent 92%,rgba(0,0,0,.55)),
+    linear-gradient(#2b211b,#1f1813);
+  box-shadow:0 0 0 14px #6b4426,0 0 0 15px #3a2414,0 30px 60px rgba(0,0,0,.6),inset 0 12px 30px rgba(0,0,0,.7);
+  margin:14px 14px 40px}
+.unit::before{content:"";position:absolute;inset:-14px;border-radius:12px;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 9px),repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 3px,transparent 3px 11px);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:14px}
+.label{font:700 11px "Space Grotesk",system-ui,-apple-system,sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#d9b77a;text-align:center;margin:0 0 12px;opacity:.8}
+.shelf{--row:calc(var(--s) + 20px + var(--plank));display:grid;grid-template-columns:repeat(auto-fill,minmax(calc(var(--s) + var(--gap)),1fr));grid-auto-rows:var(--row);justify-items:center;align-items:end;
+  margin:0 -18px;padding:0 18px;
+  background:repeating-linear-gradient(180deg,transparent 0 calc(var(--row) - var(--plank)),#a06a3c calc(var(--row) - var(--plank)),#8a5a31 calc(var(--row) - var(--plank) + 6px),#74482a calc(var(--row) - 8px),#3a2414 calc(var(--row) - 8px),#1a0f08 var(--row))}
+.slot{position:relative;width:var(--s);height:var(--s);margin-bottom:var(--plank);perspective:800px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.slot::after{content:"";position:absolute;left:6%;right:6%;bottom:-6px;height:12px;border-radius:50%;background:rgba(0,0,0,.55);filter:blur(5px);z-index:0}
+.slot .disc{position:absolute;inset:4% 4% 4% 4%;border-radius:50%;z-index:1;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.slot .sl{position:relative;width:100%;height:100%;z-index:2;transform:rotateY(var(--ry,0deg)) rotateZ(var(--rz,0deg));transform-origin:bottom center;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.slot:hover .sl,.slot:focus-visible .sl{transform:rotateY(0) rotateZ(0) translateY(-10px)}
+.slot:hover .disc{transform:translateY(-34%)}
+.star{position:absolute;top:-8px;right:-8px;z-index:4;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#2a1c08;
+  background:radial-gradient(circle at 30% 30%,#ffe6a8,#d9a441 60%,#a8761f);box-shadow:0 3px 8px rgba(0,0,0,.5)}
+
+/* ---------- sleeve + art ---------- */
+.sl{border-radius:4px;overflow:hidden;box-shadow:0 10px 22px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.06);background:#222}
+.sl svg,.sl img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
+.sl .gloss{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.22),transparent 35%,transparent 70%,rgba(0,0,0,.25));pointer-events:none}
+.sl .txt{position:absolute;left:0;right:0;bottom:0;padding:22% 9% 8%;background:linear-gradient(transparent,rgba(0,0,0,.72));color:#fff}
+.sl .ta{font:700 .62em "Space Grotesk",system-ui,-apple-system,sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl .tt{font:900 1.15em/1 Fraunces,serif;margin-top:3px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.slot .sl{font-size:calc(var(--s) / 9)}
+.disc{background:repeating-radial-gradient(circle,#0c0c0c 0 1.4px,#1b1b1b 1.4px 2.8px);box-shadow:0 6px 18px rgba(0,0,0,.6)}
+.disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 10deg,transparent 0 30deg,rgba(255,255,255,.09) 50deg,transparent 70deg 210deg,rgba(255,255,255,.06) 230deg,transparent 250deg)}
+.disc::after{content:"";position:absolute;inset:33%;border-radius:50%;background:radial-gradient(circle,#0c0c0c 0 6%,var(--lab) 7%)}
+
+/* ---------- empty / sections ---------- */
+.empty{text-align:center;color:var(--muted);padding:50px 20px 60px}
+.empty b{display:block;font:900 24px Fraunces,serif;color:var(--ink);margin-bottom:6px}
+.btn{font:600 13px "Space Grotesk",system-ui,-apple-system,sans-serif;text-decoration:none;color:var(--ink);border:1px solid #4a3a2c;padding:9px 13px;border-radius:999px;background:rgba(0,0,0,.25);cursor:pointer;transition:.2s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--brass);color:#ffd99a}
+.btn.gold{border:0;color:#2a1c08;background:linear-gradient(180deg,#f3d48a,#c99434);box-shadow:0 2px 0 #6e4c14}
+.btn.gold:hover{color:#2a1c08;filter:brightness(1.08)}
+.btn.danger:hover{border-color:#e0604a;color:#ff8a73}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* ---------- find records ---------- */
+.panel{background:rgba(0,0,0,.28);border:1px solid #3b2f25;border-radius:16px;padding:6px 16px;max-width:760px;margin:0 auto 18px}
+.ph{font:900 22px Fraunces,serif;max-width:760px;margin:26px auto 10px;display:flex;justify-content:space-between;align-items:baseline}
+.ph small{font:400 13px "Space Grotesk",system-ui,-apple-system,sans-serif;color:var(--muted)}
+.res{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #33281f}
+.res:last-child{border:0}
+.res .sl{position:relative;width:54px;height:54px;flex:none;font-size:6px}
+.res .meta{flex:1;min-width:0}.res .meta b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res .meta span{font-size:13px;color:var(--muted)}
+.res .acts{display:flex;gap:6px;flex:none}
+.res .acts .btn{padding:7px 11px;font-size:12px}
+.hint{color:var(--muted);font-size:14px;padding:14px 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0}
+.chip{font:500 13px "Space Grotesk",system-ui,-apple-system,sans-serif;color:var(--ink);background:transparent;border:1px solid #4a3a2c;border-radius:999px;padding:7px 12px;cursor:pointer}
+.chip:hover{border-color:var(--brass)}
+.row{display:grid;grid-template-columns:2fr 2fr 1fr;gap:10px;padding:14px 0 10px}
+.formacts{display:flex;gap:8px;padding-bottom:14px;flex-wrap:wrap}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #4a3a2c;border-top-color:var(--brass);border-radius:50%;animation:rot .8s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ---------- pulled-out record ---------- */
+.modal{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(8,6,5,.78);backdrop-filter:blur(8px)}
+.modal.open{display:flex;animation:fade .25s ease}
+@keyframes fade{from{opacity:0}}
+.sheet{position:relative;width:min(560px,100%);max-height:92vh;overflow:auto;background:linear-gradient(#2a201a,#1b1511);border:1px solid #4a3a2c;border-radius:22px;padding:26px 22px 22px;box-shadow:0 30px 80px rgba(0,0,0,.7);animation:rise .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{transform:translateY(30px);opacity:0}}
+.x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:1px solid #4a3a2c;background:rgba(0,0,0,.3);color:var(--ink);font-size:18px;cursor:pointer;z-index:5}
+.pull{position:relative;width:min(62vw,250px);aspect-ratio:1;margin:4px 0 0 4%}
+.pull .disc{position:absolute;inset:3%;border-radius:50%;animation:slide .9s .15s cubic-bezier(.2,.8,.2,1) forwards,spin 2.2s 1s linear infinite}
+@keyframes slide{to{transform:translateX(46%)}}
+@keyframes spin{from{transform:translateX(46%) rotate(0)}to{transform:translateX(46%) rotate(360deg)}}
+.pull .sl{position:absolute;inset:0;font-size:calc(min(62vw,250px) / 9);z-index:2;animation:out .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes out{from{transform:scale(.6) rotateY(30deg);opacity:0}}
+.sheet h3{font:900 30px/1.05 Fraunces,serif;margin-top:20px}
+.sheet .by{color:var(--muted);font-size:15px;margin-top:4px}
+.sheet .why{margin-top:12px;font-size:15px;color:#e3d6c1}
+.sheet .tr{margin-top:10px;font-size:13px;color:var(--muted)}.sheet .tr b{color:var(--brass);font-weight:600}
+.sheet .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.sheet .note{font-size:12px;color:var(--muted);margin-top:14px}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,140px);background:#f6ecdc;color:#1f150a;padding:12px 18px;border-radius:999px;font:600 14px "Space Grotesk",system-ui,-apple-system,sans-serif;display:flex;gap:14px;align-items:center;transition:transform .3s;z-index:40;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:92vw}
+.toast.show{transform:translate(-50%,0)}
+.toast button{background:none;border:0;font:700 14px "Space Grotesk",system-ui,-apple-system,sans-serif;color:#a3540f;cursor:pointer}
+
+@media(max-width:600px){
+  :root{--s:min(25vw,100px);--gap:10px;--plank:18px}
+  .room{padding:22px 12px 90px}
+  .unit{margin:12px 10px 34px;padding:14px 12px 0;box-shadow:0 0 0 10px #6b4426,0 0 0 11px #3a2414,0 24px 50px rgba(0,0,0,.6),inset 0 10px 24px rgba(0,0,0,.7)}
+  .shelf{margin:0 -12px;padding:0 6px}
+  .star{width:22px;height:22px;font-size:11px;top:-6px;right:-6px}
+  .row{grid-template-columns:1fr 1fr}.row input:first-child{grid-column:1/-1}
+  .res{flex-wrap:wrap}.res .acts{width:100%;padding-left:66px}
+  .plate{padding:9px 12px;font-size:12px}
+}
+
+.label .ti{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(180deg,#f3d48a,#c99434);color:#2a1c08;font-size:11px;letter-spacing:0;margin-right:4px}
+.label .lc{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:rgba(0,0,0,.4);letter-spacing:0;color:#e9d3a6}
+.label{font-size:13px;letter-spacing:.14em;opacity:1}
+.mt{color:var(--muted);font-size:13px;text-align:center;padding:22px 10px 30px}
+.tiers{display:flex;gap:6px;margin-top:14px;background:rgba(0,0,0,.3);border:1px solid #4a3a2c;border-radius:14px;padding:5px}
+.tiers button{flex:1;font:600 12.5px "Space Grotesk",system-ui,-apple-system,sans-serif;color:var(--ink);background:transparent;border:0;border-radius:10px;padding:9px 4px;cursor:pointer;white-space:nowrap}
+.tiers button.on{background:linear-gradient(180deg,#f3d48a,#c99434);color:#2a1c08;box-shadow:0 2px 0 #6e4c14}
+
+.tp{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:12px 0 6px}.tp span{font-size:12px;color:var(--muted);margin-right:2px}
+.chip.on{background:linear-gradient(180deg,#f3d48a,#c99434);color:#2a1c08;border-color:transparent}
+.res .acts{flex-wrap:wrap;justify-content:flex-end}
+.counts{flex-wrap:wrap;justify-content:center}
+@media(max-width:600px){.plates{justify-content:flex-start;gap:6px}.plate{padding:9px 10px;font-size:11.5px}}
+
+:root{--cap:40px}
+.shelf{--row:calc(var(--s) + var(--cap) + 20px + var(--plank))}
+.slot{height:calc(var(--s) + var(--cap))}
+.slot .disc{bottom:auto;height:calc(var(--s) * .92)}
+.slot .sl{height:var(--s)}
+.cap{position:absolute;left:-4px;right:-4px;bottom:0;height:var(--cap);text-align:center;z-index:3;display:flex;flex-direction:column;justify-content:center;line-height:1.2;pointer-events:none}
+.cap b{display:block;font:700 12.5px "Space Grotesk",system-ui,-apple-system,sans-serif;color:#f6ecdc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px #000}
+.cap span{display:block;font:500 11px "Space Grotesk",system-ui,-apple-system,sans-serif;color:#c9b79a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot::after{bottom:calc(var(--cap) - 6px)}
+@media(max-width:600px){:root{--cap:34px}.cap b{font-size:11px}.cap span{font-size:9.5px}}
+
+.tracks{margin-top:18px;border-top:1px solid #3b2f25;padding-top:12px}
+.tlh{font:600 13px "Space Grotesk",system-ui,-apple-system,sans-serif;color:var(--muted);margin-bottom:8px}
+.tl{list-style:none;margin:0;padding:0;max-height:300px;overflow:auto}
+.tl li{display:flex;gap:10px;align-items:baseline;padding:7px 2px;border-bottom:1px solid #2c231c;font-size:14px}
+.tl li:last-child{border:0}
+.tl .tn{width:22px;flex:none;text-align:right;color:var(--muted);font-size:12px}
+.tl .tt2{flex:1;color:#efe3cf}
+.tl .td{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.tl .disc-h{font:700 11px "Space Grotesk",system-ui,-apple-system,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);border:0;padding-top:12px}
+.res[data-prev]{cursor:pointer}
+.res[data-prev]:hover .meta b{color:#ffd99a}
+
+/* ---------- phone polish ---------- */
+.dl{margin-top:12px;font:600 12px "Space Grotesk",system-ui,sans-serif;color:var(--ink);background:rgba(0,0,0,.3);border:1px solid #4a3a2c;border-radius:999px;padding:7px 14px;cursor:pointer}
+.dl:hover{border-color:var(--brass)}
+.tp{flex-wrap:nowrap}
+.tp .chip{flex:1;text-align:center;padding:8px 6px;white-space:nowrap}
+@media(max-width:600px){
+  .room{padding:14px 10px 90px}
+  .top{padding:4px 0 12px}
+  .neon{font-size:34px}
+  .tag{font-size:11.5px;margin-top:6px}
+  .counts{margin-top:10px;padding:5px 12px;font-size:12px}
+  .plates{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 -10px;padding:10px;overflow:visible}
+  .plate{padding:10px 4px;font-size:12px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tools{margin:12px auto 14px}
+  input{font-size:16px}
+  .ph{font-size:19px;margin:18px 2px 8px}.ph small{font-size:11.5px}
+  .panel{padding:2px 12px;border-radius:14px}
+  .tp{gap:5px;padding:10px 0 4px}.tp span{display:none}.tp .chip{font-size:11.5px;padding:8px 2px}
+  .res{display:grid;grid-template-columns:48px 1fr;column-gap:12px;row-gap:8px;padding:10px 0;align-items:center}
+  .res .sl{width:48px;height:48px}
+  .res .meta b{font-size:14px;white-space:normal}.res .meta span{font-size:12px}
+  .res .acts{grid-column:2;width:auto;padding:0;justify-content:flex-start;gap:6px;flex-wrap:nowrap}
+  .res .acts .btn{padding:6px 10px;font-size:11.5px}
+  .unit{margin:10px 6px 26px}
+  .modal{padding:0;align-items:flex-end}
+  .sheet{width:100%;max-height:94vh;border-radius:22px 22px 0 0;padding:20px 16px calc(18px + env(safe-area-inset-bottom))}
+  .pull{width:min(58vw,230px);margin-top:0}
+  .sheet h3{font-size:26px;margin-top:14px}
+  .tiers button{font-size:11.5px;padding:9px 2px}
+  .sheet .acts .btn{padding:8px 12px;font-size:12.5px}
+  .tl{max-height:none}
+  .x{position:sticky;float:right;top:0}
+}
+
+.covrow{margin-top:12px}
+.linkbtn{background:none;border:0;color:var(--brass);font:600 13px "Space Grotesk",system-ui,sans-serif;cursor:pointer;padding:4px 0}
+#covpick{margin-top:6px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px}
+.copt{background:rgba(0,0,0,.3);border:1px solid #4a3a2c;border-radius:10px;padding:5px;cursor:pointer;color:var(--ink);text-align:left}
+.copt:hover,.copt:focus{border-color:var(--brass)}
+.copt img{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px}
+.copt span{display:block;font:500 10.5px "Space Grotesk",system-ui,sans-serif;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+
+.syncbox{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:10px}
+.syncbox .dl{margin-top:0}
+.sst{font:500 12px "Space Grotesk",system-ui,sans-serif;color:var(--muted)}
+</style></head><body><div id="shell"><div class="room">
+  <header class="top">
+    <div class="neon">Shahaf's <span>Record Room</span></div>
+    <p class="tag">grunge · classic rock · alt — pulled from my Spotify likes</p>
+    <div class="counts"><span><b id="sWish">0</b> wanted</span><span class="dot">•</span><span><b id="sHave">0</b> on my shelf</span></div>
+    <div class="syncbox" id="syncBox"></div>
+  </header>
+  <nav class="plates" id="tabs">
+    <button data-tab="wish" class="plate on">♡ Wishlist</button>
+    <button data-tab="have" class="plate">◉ My Collection</button>
+    <button data-tab="add" class="plate">＋ Find records</button>
+  </nav>
+  <div class="tools"><input id="filter" type="search" placeholder="Filter this shelf…" autocomplete="off"><span id="saveState" class="save"></span></div>
+  <main id="main"></main>
+</div>
+<div id="modal" class="modal" aria-hidden="true"></div>
+<div id="toast" class="toast"></div>
+<input type="file" id="photoInput" accept="image/*" hidden>
+</div><script id="state" type="application/json">{"wish": [{"id": "p_m2", "a": "Pearl Jam", "t": "Vs.", "y": 1993, "why": "Angrier and punchier than Ten", "tier": "must"}, {"id": "p_m4", "a": "Audioslave", "t": "Audioslave", "y": 2002, "why": "Cornell with Rage's band", "tier": "cheap"}, {"id": "p_m5", "a": "Chris Cornell", "t": "Songbook", "y": 2011, "why": "Live acoustic, just Cornell and a guitar", "tier": "good"}, {"id": "p_m6", "a": "The Smashing Pumpkins", "t": "Siamese Dream", "y": 1993, "why": "Walls of fuzzy guitar", "tier": "must"}, {"id": "p_m7", "a": "Pink Floyd", "t": "Animals", "y": 1977, "why": "Gilmour's heaviest playing", "tier": "cheap"}, {"id": "p_m8", "a": "Led Zeppelin", "t": "Led Zeppelin IV", "y": 1971, "why": "Essential on any rock shelf", "tier": "good"}, {"id": "p_m9", "a": "Black Sabbath", "t": "Paranoid", "y": 1970, "why": "Where the heavy riffs began", "tier": "cheap"}, {"id": "p_m10", "a": "Fleetwood Mac", "t": "Rumours", "y": 1977, "why": "One of the best-selling albums ever", "tier": "good"}, {"id": "p_m11", "a": "Queens of the Stone Age", "t": "Songs for the Deaf", "y": 2002, "why": "A desert-rock monster", "tier": "good"}, {"id": "p_m12", "a": "Radiohead", "t": "OK Computer", "y": 1997, "why": "An alt-rock landmark", "tier": "must"}, {"id": "p_m13", "a": "Metallica", "t": "Metallica (Black Album)", "y": 1991, "why": "The big one", "tier": "good"}, {"id": "p_m14", "a": "Jeff Buckley", "t": "Grace", "y": 1994, "why": "A voice like no one else's", "tier": "must"}, {"id": "p_m15", "a": "Radiohead", "t": "Kid A", "y": 2000, "why": "The strange, electronic follow-up to OK Computer", "tier": "good"}, {"id": "p_m16", "a": "Oasis", "t": "(What's the Story) Morning Glory?", "y": 1995, "why": "Big Britpop singalongs", "tier": "good"}, {"id": "p_m17", "a": "Michael Jackson", "t": "Thriller", "y": 1982, "why": "The best-selling album ever", "tier": "good"}, {"id": "p_m18", "a": "King Crimson", "t": "In the Court of the Crimson King", "y": 1969, "why": "The album that started prog", "tier": "must"}, {"id": "p_m19", "a": "The Cranberries", "t": "MTV Unplugged", "y": 2025, "why": "Their 1995 acoustic MTV set, first released on vinyl in 2025", "tier": "must"}], "have": [{"id": "q1795263457y", "a": "Yes", "t": "Close to the Edge", "y": 1972}, {"id": "n1795200749r", "a": "Rage Against the Machine", "t": "Rage Against the Machine", "y": 1992}, {"id": "xmwpbovhbngcl", "a": "Radiohead", "t": "In Rainbows", "y": 2007}, {"id": "w3", "a": "Pink Floyd", "t": "The Dark Side of the Moon", "y": 1973, "why": "Plays as one continuous piece, which is exactly what vinyl is for.", "k": ["Time", "Money", "Us and Them"]}, {"id": "w11", "a": "Nirvana", "t": "MTV Unplugged in New York", "y": 1994, "why": "Stripped-down Nirvana. Pairs perfectly with the AIC Unplugged.", "k": ["About a Girl", "The Man Who Sold the World"]}, {"id": "w7", "a": "Alice in Chains", "t": "MTV Unplugged", "y": 1996, "why": "Raw and emotional. A real collector's piece.", "k": ["Nutshell", "Down in a Hole", "Over Now"]}], "picks": []}</script><script id="app">(function(){
+const $ = s => document.querySelector(s);
+const SHELL = $("#shell").innerHTML;
+let S;
+try { S = JSON.parse($("#state").textContent); } catch(e){ S = {wish:[],have:[]}; }
+S.wish = S.wish||[]; S.have = S.have||[]; S.picks = S.picks||[];
+const TIERED = l => l==="wish"||l==="picks";
+const LISTNAME = {wish:"Wishlist",picks:"My picks",have:"My collection"};
+const TIERS = [["must","Must have","★"],["good","Good to have","♡"],["cheap","If it's cheap","$"]];
+S.wish.forEach(x=>{ if(!x.tier) x.tier = x.star ? "must" : "good"; delete x.star; });
+let tab = "wish", q = "", LOCAL = false;
+
+/* ---------- album database ---------- */
+const CAT = [["Alice in Chains", "Facelift", 1990], ["Alice in Chains", "Sap", 1992], ["Alice in Chains", "Dirt", 1992], ["Alice in Chains", "Jar of Flies", 1994], ["Alice in Chains", "Alice in Chains", 1995], ["Alice in Chains", "MTV Unplugged", 1996], ["Alice in Chains", "Live", 2000], ["Alice in Chains", "Black Gives Way to Blue", 2009], ["Alice in Chains", "The Devil Put Dinosaurs Here", 2013], ["Alice in Chains", "Rainier Fog", 2018], ["Jerry Cantrell", "Boggy Depot", 1998], ["Jerry Cantrell", "Degradation Trip", 2002], ["Jerry Cantrell", "Brighten", 2021], ["Jerry Cantrell", "I Want Blood", 2024], ["Mad Season", "Above", 1995], ["Pink Floyd", "The Piper at the Gates of Dawn", 1967], ["Pink Floyd", "A Saucerful of Secrets", 1968], ["Pink Floyd", "Ummagumma", 1969], ["Pink Floyd", "Atom Heart Mother", 1970], ["Pink Floyd", "Meddle", 1971], ["Pink Floyd", "Obscured by Clouds", 1972], ["Pink Floyd", "The Dark Side of the Moon", 1973], ["Pink Floyd", "Wish You Were Here", 1975], ["Pink Floyd", "Animals", 1977], ["Pink Floyd", "The Wall", 1979], ["Pink Floyd", "The Final Cut", 1983], ["Pink Floyd", "A Momentary Lapse of Reason", 1987], ["Pink Floyd", "The Division Bell", 1994], ["Pink Floyd", "Pulse", 1995], ["David Gilmour", "On an Island", 2006], ["David Gilmour", "Rattle That Lock", 2015], ["David Gilmour", "Luck and Strange", 2024], ["Roger Waters", "Amused to Death", 1992], ["The Beatles", "Please Please Me", 1963], ["The Beatles", "With the Beatles", 1963], ["The Beatles", "A Hard Day's Night", 1964], ["The Beatles", "Beatles for Sale", 1964], ["The Beatles", "Help!", 1965], ["The Beatles", "Rubber Soul", 1965], ["The Beatles", "Revolver", 1966], ["The Beatles", "Sgt. Pepper's Lonely Hearts Club Band", 1967], ["The Beatles", "Magical Mystery Tour", 1967], ["The Beatles", "The Beatles (White Album)", 1968], ["The Beatles", "Yellow Submarine", 1969], ["The Beatles", "Abbey Road", 1969], ["The Beatles", "Let It Be", 1970], ["The Beatles", "1", 2000], ["Paul McCartney & Wings", "Band on the Run", 1973], ["John Lennon", "Imagine", 1971], ["George Harrison", "All Things Must Pass", 1970], ["Nirvana", "Bleach", 1989], ["Nirvana", "Nevermind", 1991], ["Nirvana", "Incesticide", 1992], ["Nirvana", "In Utero", 1993], ["Nirvana", "MTV Unplugged in New York", 1994], ["Nirvana", "From the Muddy Banks of the Wishkah", 1996], ["Foo Fighters", "Foo Fighters", 1995], ["Foo Fighters", "The Colour and the Shape", 1997], ["Foo Fighters", "There Is Nothing Left to Lose", 1999], ["Foo Fighters", "One by One", 2002], ["Foo Fighters", "In Your Honor", 2005], ["Foo Fighters", "Echoes, Silence, Patience & Grace", 2007], ["Foo Fighters", "Wasting Light", 2011], ["Foo Fighters", "But Here We Are", 2023], ["Jimi Hendrix", "Are You Experienced", 1967], ["Jimi Hendrix", "Axis: Bold as Love", 1967], ["Jimi Hendrix", "Electric Ladyland", 1968], ["Jimi Hendrix", "Band of Gypsys", 1970], ["Jimi Hendrix", "Live at Woodstock", 1999], ["Jimi Hendrix", "Blues", 1994], ["Soundgarden", "Ultramega OK", 1988], ["Soundgarden", "Louder Than Love", 1989], ["Soundgarden", "Badmotorfinger", 1991], ["Soundgarden", "Superunknown", 1994], ["Soundgarden", "Down on the Upside", 1996], ["Soundgarden", "King Animal", 2012], ["Chris Cornell", "Euphoria Morning", 1999], ["Chris Cornell", "Songbook", 2011], ["Chris Cornell", "Higher Truth", 2015], ["Temple of the Dog", "Temple of the Dog", 1991], ["Audioslave", "Audioslave", 2002], ["Audioslave", "Out of Exile", 2005], ["Audioslave", "Revelations", 2006], ["Red Hot Chili Peppers", "The Uplift Mofo Party Plan", 1987], ["Red Hot Chili Peppers", "Mother's Milk", 1989], ["Red Hot Chili Peppers", "Blood Sugar Sex Magik", 1991], ["Red Hot Chili Peppers", "One Hot Minute", 1995], ["Red Hot Chili Peppers", "Californication", 1999], ["Red Hot Chili Peppers", "By the Way", 2002], ["Red Hot Chili Peppers", "Stadium Arcadium", 2006], ["Red Hot Chili Peppers", "I'm with You", 2011], ["Red Hot Chili Peppers", "The Getaway", 2016], ["Red Hot Chili Peppers", "Unlimited Love", 2022], ["Red Hot Chili Peppers", "Return of the Dream Canteen", 2022], ["John Frusciante", "Shadows Collide with People", 2004], ["John Frusciante", "The Empyrean", 2009], ["Coldplay", "Parachutes", 2000], ["Coldplay", "A Rush of Blood to the Head", 2002], ["Coldplay", "X&Y", 2005], ["Coldplay", "Viva la Vida or Death and All His Friends", 2008], ["Coldplay", "Mylo Xyloto", 2011], ["Coldplay", "Ghost Stories", 2014], ["Coldplay", "A Head Full of Dreams", 2015], ["Coldplay", "Everyday Life", 2019], ["Coldplay", "Music of the Spheres", 2021], ["Coldplay", "Moon Music", 2024], ["Deftones", "Adrenaline", 1995], ["Deftones", "Around the Fur", 1997], ["Deftones", "White Pony", 2000], ["Deftones", "Deftones", 2003], ["Deftones", "Saturday Night Wrist", 2006], ["Deftones", "Diamond Eyes", 2010], ["Deftones", "Koi No Yokan", 2012], ["Deftones", "Gore", 2016], ["Deftones", "Ohms", 2020], ["Deftones", "Private Music", 2025], ["Pearl Jam", "Ten", 1991], ["Pearl Jam", "Vs.", 1993], ["Pearl Jam", "Vitalogy", 1994], ["Pearl Jam", "No Code", 1996], ["Pearl Jam", "Yield", 1998], ["Pearl Jam", "Binaural", 2000], ["Pearl Jam", "Riot Act", 2002], ["Pearl Jam", "Pearl Jam", 2006], ["Pearl Jam", "Backspacer", 2009], ["Pearl Jam", "Lightning Bolt", 2013], ["Pearl Jam", "Gigaton", 2020], ["Pearl Jam", "Dark Matter", 2024], ["Eddie Vedder", "Into the Wild", 2007], ["Stone Temple Pilots", "Core", 1992], ["Stone Temple Pilots", "Purple", 1994], ["Stone Temple Pilots", "Tiny Music... Songs from the Vatican Gift Shop", 1996], ["Stone Temple Pilots", "No. 4", 1999], ["Velvet Revolver", "Contraband", 2004], ["Screaming Trees", "Sweet Oblivion", 1992], ["Screaming Trees", "Dust", 1996], ["Mark Lanegan", "Bubblegum", 2004], ["Mudhoney", "Superfuzz Bigmuff", 1988], ["Mudhoney", "Every Good Boy Deserves Fudge", 1991], ["Green River", "Rehab Doll", 1988], ["Mother Love Bone", "Apple", 1990], ["Melvins", "Houdini", 1993], ["Silverchair", "Frogstomp", 1995], ["Silverchair", "Freak Show", 1997], ["Bush", "Sixteen Stone", 1994], ["Bush", "Razorblade Suitcase", 1996], ["Candlebox", "Candlebox", 1993], ["Hole", "Live Through This", 1994], ["L7", "Bricks Are Heavy", 1992], ["Smashing Pumpkins", "Gish", 1991], ["Smashing Pumpkins", "Siamese Dream", 1993], ["Smashing Pumpkins", "Mellon Collie and the Infinite Sadness", 1995], ["Smashing Pumpkins", "Adore", 1998], ["Smashing Pumpkins", "Machina/The Machines of God", 2000], ["Queens of the Stone Age", "Queens of the Stone Age", 1998], ["Queens of the Stone Age", "Rated R", 2000], ["Queens of the Stone Age", "Songs for the Deaf", 2002], ["Queens of the Stone Age", "Lullabies to Paralyze", 2005], ["Queens of the Stone Age", "Era Vulgaris", 2007], ["Queens of the Stone Age", "...Like Clockwork", 2013], ["Queens of the Stone Age", "Villains", 2017], ["Queens of the Stone Age", "In Times New Roman...", 2023], ["Kyuss", "Blues for the Red Sun", 1992], ["Kyuss", "Welcome to Sky Valley", 1994], ["Tool", "Undertow", 1993], ["Tool", "Ænima", 1996], ["Tool", "Lateralus", 2001], ["Tool", "10,000 Days", 2006], ["Tool", "Fear Inoculum", 2019], ["A Perfect Circle", "Mer de Noms", 2000], ["A Perfect Circle", "Thirteenth Step", 2003], ["Rage Against the Machine", "Rage Against the Machine", 1992], ["Rage Against the Machine", "Evil Empire", 1996], ["Rage Against the Machine", "The Battle of Los Angeles", 1999], ["Radiohead", "Pablo Honey", 1993], ["Radiohead", "The Bends", 1995], ["Radiohead", "OK Computer", 1997], ["Radiohead", "Kid A", 2000], ["Radiohead", "Amnesiac", 2001], ["Radiohead", "Hail to the Thief", 2003], ["Radiohead", "In Rainbows", 2007], ["Radiohead", "The King of Limbs", 2011], ["Radiohead", "A Moon Shaped Pool", 2016], ["Thom Yorke", "The Eraser", 2006], ["The Smile", "A Light for Attracting Attention", 2022], ["Muse", "Showbiz", 1999], ["Muse", "Origin of Symmetry", 2001], ["Muse", "Absolution", 2003], ["Muse", "Black Holes and Revelations", 2006], ["Muse", "The Resistance", 2009], ["Muse", "Drones", 2015], ["Arctic Monkeys", "Whatever People Say I Am, That's What I'm Not", 2006], ["Arctic Monkeys", "Favourite Worst Nightmare", 2007], ["Arctic Monkeys", "Humbug", 2009], ["Arctic Monkeys", "Suck It and See", 2011], ["Arctic Monkeys", "AM", 2013], ["Arctic Monkeys", "Tranquility Base Hotel & Casino", 2018], ["Arctic Monkeys", "The Car", 2022], ["The Strokes", "Is This It", 2001], ["The Strokes", "Room on Fire", 2003], ["The White Stripes", "White Blood Cells", 2001], ["The White Stripes", "Elephant", 2003], ["The White Stripes", "Get Behind Me Satan", 2005], ["Jack White", "Blunderbuss", 2012], ["The Black Keys", "Brothers", 2010], ["The Black Keys", "El Camino", 2011], ["The Black Keys", "Turn Blue", 2014], ["The Killers", "Hot Fuss", 2004], ["The Killers", "Sam's Town", 2006], ["Kings of Leon", "Only by the Night", 2008], ["Oasis", "Definitely Maybe", 1994], ["Oasis", "(What's the Story) Morning Glory?", 1995], ["Oasis", "Be Here Now", 1997], ["Blur", "Parklife", 1994], ["Blur", "Blur", 1997], ["The Verve", "Urban Hymns", 1997], ["Placebo", "Without You I'm Nothing", 1998], ["Placebo", "Meds", 2006], ["Weezer", "Weezer (Blue Album)", 1994], ["Weezer", "Pinkerton", 1996], ["Green Day", "Dookie", 1994], ["Green Day", "American Idiot", 2004], ["The Offspring", "Smash", 1994], ["Blink-182", "Enema of the State", 1999], ["Incubus", "Make Yourself", 1999], ["Incubus", "Morning View", 2001], ["Linkin Park", "Hybrid Theory", 2000], ["Linkin Park", "Meteora", 2003], ["System of a Down", "Toxicity", 2001], ["System of a Down", "Mezmerize", 2005], ["Korn", "Korn", 1994], ["Korn", "Follow the Leader", 1998], ["Faith No More", "The Real Thing", 1989], ["Faith No More", "Angel Dust", 1992], ["Jane's Addiction", "Nothing's Shocking", 1988], ["Jane's Addiction", "Ritual de lo Habitual", 1990], ["Pixies", "Surfer Rosa", 1988], ["Pixies", "Doolittle", 1989], ["Sonic Youth", "Daydream Nation", 1988], ["Sonic Youth", "Goo", 1990], ["R.E.M.", "Automatic for the People", 1992], ["R.E.M.", "Out of Time", 1991], ["The Cure", "Disintegration", 1989], ["The Cure", "Pornography", 1982], ["Joy Division", "Unknown Pleasures", 1979], ["Joy Division", "Closer", 1980], ["The Smiths", "The Queen Is Dead", 1986], ["U2", "The Joshua Tree", 1987], ["U2", "Achtung Baby", 1991], ["Depeche Mode", "Violator", 1990], ["Nine Inch Nails", "Pretty Hate Machine", 1989], ["Nine Inch Nails", "The Downward Spiral", 1994], ["Nine Inch Nails", "The Fragile", 1999], ["Marilyn Manson", "Antichrist Superstar", 1996], ["Jeff Buckley", "Grace", 1994], ["Elliott Smith", "Either/Or", 1997], ["Elliott Smith", "XO", 1998], ["Portishead", "Dummy", 1994], ["Massive Attack", "Mezzanine", 1998], ["Led Zeppelin", "Led Zeppelin", 1969], ["Led Zeppelin", "Led Zeppelin II", 1969], ["Led Zeppelin", "Led Zeppelin III", 1970], ["Led Zeppelin", "Led Zeppelin IV", 1971], ["Led Zeppelin", "Houses of the Holy", 1973], ["Led Zeppelin", "Physical Graffiti", 1975], ["Led Zeppelin", "Presence", 1976], ["Black Sabbath", "Black Sabbath", 1970], ["Black Sabbath", "Paranoid", 1970], ["Black Sabbath", "Master of Reality", 1971], ["Black Sabbath", "Vol. 4", 1972], ["Black Sabbath", "Sabbath Bloody Sabbath", 1973], ["Black Sabbath", "Heaven and Hell", 1980], ["Ozzy Osbourne", "Blizzard of Ozz", 1980], ["Deep Purple", "Machine Head", 1972], ["Deep Purple", "In Rock", 1970], ["Rainbow", "Ritchie Blackmore's Rainbow", 1975], ["Rainbow", "Rising", 1976], ["Rainbow", "Long Live Rock 'n' Roll", 1978], ["Rainbow", "Down to Earth", 1979], ["Dio", "Holy Diver", 1983], ["The Rolling Stones", "Let It Bleed", 1969], ["The Rolling Stones", "Sticky Fingers", 1971], ["The Rolling Stones", "Exile on Main St.", 1972], ["The Rolling Stones", "Beggars Banquet", 1968], ["The Who", "Who's Next", 1971], ["The Who", "Quadrophenia", 1973], ["The Who", "Tommy", 1969], ["The Doors", "The Doors", 1967], ["The Doors", "L.A. Woman", 1971], ["The Doors", "Morrison Hotel", 1970], ["Cream", "Disraeli Gears", 1967], ["Cream", "Wheels of Fire", 1968], ["Eric Clapton", "Unplugged", 1992], ["Derek and the Dominos", "Layla and Other Assorted Love Songs", 1970], ["Jethro Tull", "Aqualung", 1971], ["Queen", "A Night at the Opera", 1975], ["Queen", "News of the World", 1977], ["Queen", "Sheer Heart Attack", 1974], ["Queen", "The Game", 1980], ["Queen", "Greatest Hits", 1981], ["David Bowie", "The Rise and Fall of Ziggy Stardust and the Spiders from Mars", 1972], ["David Bowie", "Hunky Dory", 1971], ["David Bowie", "Heroes", 1977], ["David Bowie", "Blackstar", 2016], ["The Velvet Underground", "The Velvet Underground & Nico", 1967], ["Lou Reed", "Transformer", 1972], ["Neil Young", "Harvest", 1972], ["Neil Young", "Rust Never Sleeps", 1979], ["Neil Young & Crazy Horse", "Everybody Knows This Is Nowhere", 1969], ["Crosby, Stills, Nash & Young", "Déjà Vu", 1970], ["Bob Dylan", "Highway 61 Revisited", 1965], ["Bob Dylan", "Blood on the Tracks", 1975], ["Bob Dylan", "Blonde on Blonde", 1966], ["Simon & Garfunkel", "Bridge over Troubled Water", 1970], ["Fleetwood Mac", "Rumours", 1977], ["Fleetwood Mac", "Tusk", 1979], ["Eagles", "Hotel California", 1976], ["Creedence Clearwater Revival", "Cosmo's Factory", 1970], ["Creedence Clearwater Revival", "Green River", 1969], ["The Allman Brothers Band", "At Fillmore East", 1971], ["Lynyrd Skynyrd", "(Pronounced 'Lĕh-'nérd 'Skin-'nérd)", 1973], ["ZZ Top", "Eliminator", 1983], ["Santana", "Abraxas", 1970], ["Santana", "Supernatural", 1999], ["Stevie Ray Vaughan", "Texas Flood", 1983], ["Stevie Ray Vaughan", "Couldn't Stand the Weather", 1984], ["B.B. King", "Live at the Regal", 1965], ["Gary Moore", "Still Got the Blues", 1990], ["Dire Straits", "Brothers in Arms", 1985], ["Dire Straits", "Dire Straits", 1978], ["Mark Knopfler", "Golden Heart", 1996], ["The Police", "Synchronicity", 1983], ["The Clash", "London Calling", 1979], ["Sex Pistols", "Never Mind the Bollocks, Here's the Sex Pistols", 1977], ["Ramones", "Ramones", 1976], ["Talking Heads", "Remain in Light", 1980], ["Genesis", "Selling England by the Pound", 1973], ["Yes", "Close to the Edge", 1972], ["Yes", "Fragile", 1971], ["King Crimson", "In the Court of the Crimson King", 1969], ["Rush", "Moving Pictures", 1981], ["Rush", "2112", 1976], ["Porcupine Tree", "In Absentia", 2002], ["Porcupine Tree", "Fear of a Blank Planet", 2007], ["Steven Wilson", "The Raven That Refused to Sing", 2013], ["Opeth", "Blackwater Park", 2001], ["Opeth", "Damnation", 2003], ["Mastodon", "Leviathan", 2004], ["Mastodon", "Crack the Skye", 2009], ["Gojira", "From Mars to Sirius", 2005], ["Gojira", "Magma", 2016], ["AC/DC", "Highway to Hell", 1979], ["AC/DC", "Back in Black", 1980], ["AC/DC", "Let There Be Rock", 1977], ["Guns N' Roses", "Appetite for Destruction", 1987], ["Guns N' Roses", "Use Your Illusion I", 1991], ["Guns N' Roses", "Use Your Illusion II", 1991], ["Slash", "Slash", 2010], ["Van Halen", "Van Halen", 1978], ["Van Halen", "1984", 1984], ["Aerosmith", "Toys in the Attic", 1975], ["Aerosmith", "Rocks", 1976], ["Aerosmith", "Pump", 1989], ["Kiss", "Destroyer", 1976], ["Def Leppard", "Hysteria", 1987], ["Bon Jovi", "Slippery When Wet", 1986], ["Mötley Crüe", "Dr. Feelgood", 1989], ["Skid Row", "Slave to the Grind", 1991], ["Whitesnake", "Whitesnake", 1987], ["Thin Lizzy", "Jailbreak", 1976], ["Scorpions", "Love at First Sting", 1984], ["Iron Maiden", "The Number of the Beast", 1982], ["Iron Maiden", "Powerslave", 1984], ["Iron Maiden", "Seventh Son of a Seventh Son", 1988], ["Judas Priest", "British Steel", 1980], ["Judas Priest", "Painkiller", 1990], ["Motörhead", "Ace of Spades", 1980], ["Metallica", "Kill 'Em All", 1983], ["Metallica", "Ride the Lightning", 1984], ["Metallica", "Master of Puppets", 1986], ["Metallica", "...And Justice for All", 1988], ["Metallica", "Metallica (Black Album)", 1991], ["Metallica", "Load", 1996], ["Metallica", "S&M", 1999], ["Metallica", "72 Seasons", 2023], ["Megadeth", "Rust in Peace", 1990], ["Megadeth", "Countdown to Extinction", 1992], ["Slayer", "Reign in Blood", 1986], ["Pantera", "Cowboys from Hell", 1990], ["Pantera", "Vulgar Display of Power", 1992], ["Pantera", "Far Beyond Driven", 1994], ["Sepultura", "Roots", 1996], ["Type O Negative", "October Rust", 1996], ["Danzig", "Danzig", 1988], ["Life of Agony", "River Runs Red", 1993], ["Helmet", "Meantime", 1992], ["Sevendust", "Sevendust", 1997], ["Chevelle", "Wonder What's Next", 2002], ["Alter Bridge", "Blackbird", 2007], ["Creed", "Human Clay", 1999], ["Godsmack", "Godsmack", 1998], ["Staind", "Break the Cycle", 2001], ["Breaking Benjamin", "Phobia", 2006], ["Three Days Grace", "One-X", 2006], ["Seether", "Disclaimer", 2002], ["Shinedown", "The Sound of Madness", 2008], ["Ghost", "Meliora", 2015], ["Ghost", "Impera", 2022], ["Sleep Token", "Take Me Back to Eden", 2023], ["Bring Me the Horizon", "Sempiternal", 2013], ["Bring Me the Horizon", "Amo", 2019], ["Royal Blood", "Royal Blood", 2014], ["Greta Van Fleet", "Anthem of the Peaceful Army", 2018], ["Wolfmother", "Wolfmother", 2005], ["Rival Sons", "Pressure & Time", 2011], ["Gary Clark Jr.", "Blak and Blu", 2012], ["John Mayer", "Continuum", 2006], ["John Mayer Trio", "Try!", 2005], ["Joe Bonamassa", "Blues of Desperation", 2016], ["Tame Impala", "Lonerism", 2012], ["Tame Impala", "Currents", 2015], ["The Doors", "Strange Days", 1967], ["Nick Drake", "Pink Moon", 1972], ["Fleetwood Mac", "Fleetwood Mac", 1975], ["Prince and the Revolution", "Purple Rain", 1984], ["Michael Jackson", "Thriller", 1982], ["Michael Jackson", "Bad", 1987], ["Elton John", "Goodbye Yellow Brick Road", 1973], ["Billy Joel", "The Stranger", 1977], ["Bruce Springsteen", "Born to Run", 1975], ["Bruce Springsteen", "Born in the U.S.A.", 1984], ["Tom Petty", "Full Moon Fever", 1989], ["Tom Petty and the Heartbreakers", "Damn the Torpedoes", 1979], ["Johnny Cash", "American IV: The Man Comes Around", 2002], ["Johnny Cash", "At Folsom Prison", 1968], ["Amy Winehouse", "Back to Black", 2006], ["Adele", "21", 2011], ["Lana Del Rey", "Born to Die", 2012], ["Billie Eilish", "When We All Fall Asleep, Where Do We Go?", 2019], ["Taylor Swift", "1989", 2014], ["Daft Punk", "Random Access Memories", 2013], ["Daft Punk", "Discovery", 2001], ["Gorillaz", "Demon Days", 2005], ["Kendrick Lamar", "To Pimp a Butterfly", 2015], ["Kanye West", "My Beautiful Dark Twisted Fantasy", 2010], ["Eminem", "The Marshall Mathers LP", 2000], ["Dr. Dre", "2001", 1999], ["The Weeknd", "After Hours", 2020], ["Frank Ocean", "Blonde", 2016], ["Miles Davis", "Kind of Blue", 1959], ["John Coltrane", "A Love Supreme", 1965], ["Dave Brubeck Quartet", "Time Out", 1959], ["Bob Marley & The Wailers", "Legend", 1984], ["Bob Marley & The Wailers", "Exodus", 1977], ["Hans Zimmer", "Interstellar (Soundtrack)", 2014], ["Various Artists", "Singles (Soundtrack)", 1992], ["Various Artists", "Pulp Fiction (Soundtrack)", 1994], ["Various Artists", "Guardians of the Galaxy: Awesome Mix Vol. 1", 2014], ["Arik Einstein & Shalom Hanoch", "Shablul", 1970], ["Kaveret", "Poogy Tales", 1973], ["Mashina", "Mashina", 1985], ["Shalom Hanoch", "Mehakim LaMashiah", 1985], ["Ehud Banai", "Ehud Banai VeHaPlitim", 1987], ["Berry Sakharof", "Simanim Shel Hulsha", 1993], ["Hadag Nahash", "Lazuz", 2003], ["Asaf Avidan & the Mojos", "The Reckoning", 2008], ["Orphaned Land", "Mabool", 2004], ["Orphaned Land", "All Is One", 2013], ["Infected Mushroom", "Converting Vegetarians", 2003], ["The Cranberries", "Everybody Else Is Doing It, So Why Can't We?", 1993], ["The Cranberries", "No Need to Argue", 1994], ["The Cranberries", "To the Faithful Departed", 1996], ["The Cranberries", "MTV Unplugged", 2025], ["America", "America", 1971], ["America", "Homecoming", 1972], ["Genesis", "Foxtrot", 1972], ["Genesis", "The Lamb Lies Down on Broadway", 1974], ["Peter Gabriel", "So", 1986], ["Phil Collins", "Face Value", 1981], ["Tears for Fears", "Songs from the Big Chair", 1985], ["Toto", "Toto IV", 1982], ["Steely Dan", "Aja", 1977], ["Supertramp", "Breakfast in America", 1979], ["Stevie Wonder", "Songs in the Key of Life", 1976], ["Earth, Wind & Fire", "That's the Way of the World", 1975], ["The Beach Boys", "Pet Sounds", 1966], ["Cat Stevens", "Tea for the Tillerman", 1970], ["James Taylor", "Sweet Baby James", 1970], ["Crosby, Stills & Nash", "Crosby, Stills & Nash", 1969], ["Michael Jackson", "Off the Wall", 1979], ["Michael Jackson", "Dangerous", 1991], ["The Jackson 5", "ABC", 1970]];
+
+/* ---------- helpers ---------- */
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const enc = encodeURIComponent;
+const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+const same = (x,a,t) => norm(x.a)===norm(a) && norm(x.t)===norm(t);
+const where = (a,t) => ["have","picks","wish"].find(l=>S[l].some(x=>same(x,a,t))) || null;
+const uid = () => "x"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const all = () => S.wish.concat(S.picks,S.have);
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* ---------- original generative sleeve art ---------- */
+const PALS=[["#1b1a2e","#e94f37","#f6bd60","#f7ede2"],["#0b3d3a","#f2c14e","#f78154","#4d9078"],["#2b2d42","#8d99ae","#ef233c","#edf2f4"],["#3d1f3d","#ff6f59","#ffd166","#06d6a0"],["#14213d","#fca311","#e5e5e5","#ff5d8f"],["#283618","#dda15e","#bc6c25","#fefae0"],["#0d1b2a","#415a77","#e0e1dd","#ee6c4d"],["#4a0e4e","#ff8fab","#ffd6a5","#9bf6ff"],["#1d3557","#e63946","#f1faee","#a8dadc"],["#22223b","#c9ada7","#f2e9e4","#9a8c98"],["#001219","#ee9b00","#ca6702","#94d2bd"],["#2d0320","#ff5400","#ffbd00","#7b2cbf"],["#10002b","#e0aaff","#7b2cbf","#ffd60a"],["#3c1518","#d58936","#f2f3ae","#69140e"]];
+const GENRE = {
+  grunge:["alice in chains","jerry cantrell","soundgarden","nirvana","pearl jam","stone temple pilots","mad season","temple of the dog","audioslave","chris cornell","mother love bone","screaming trees","mudhoney","melvins","silverchair","bush","hole","the smashing pumpkins","smashing pumpkins","velvet revolver","candlebox","green river","l7","mark lanegan","eddie vedder"],
+  psych:["jimi hendrix","the beatles","cream","the doors","john lennon","george harrison","paul mccartney wings","tame impala","jefferson airplane","santana","the velvet underground"],
+  space:["pink floyd","david gilmour","roger waters","radiohead","thom yorke","the smile","muse","porcupine tree","steven wilson","king crimson","yes","genesis","rush","massive attack","portishead"],
+  heavy:["black sabbath","metallica","led zeppelin","deftones","tool","a perfect circle","queens of the stone age","kyuss","pantera","megadeth","slayer","iron maiden","judas priest","motorhead","system of a down","korn","rage against the machine","nine inch nails","mastodon","gojira","opeth","sepultura","type o negative","ozzy osbourne","dio","deep purple","rainbow","ac dc","guns n roses","faith no more","helmet","ghost","sleep token","bring me the horizon","linkin park"],
+  soft:["jeff buckley","fleetwood mac","elliott smith","nick drake","simon garfunkel","neil young","crosby stills nash young","bob dylan","eric clapton","john mayer","eagles","adele","lana del rey","amy winehouse","coldplay"],
+  funk:["red hot chili peppers","john frusciante","prince and the revolution","gorillaz","daft punk","michael jackson"],
+  brit:["oasis","blur","the verve","arctic monkeys","the strokes","the killers","the white stripes","the black keys","placebo","kings of leon","the cure","the smiths","joy division","u2","r e m","pixies","weezer","green day","foo fighters","royal blood","the clash","ramones","sex pistols","talking heads","the police","depeche mode"]
+};
+const GPAL = {
+  grunge:[["#1c1814","#6b5a3e","#a8442a","#c9b48a"],["#151a17","#4f5d4a","#8c3b2e","#b8a77a"],["#1a1416","#5c4050","#b0662e","#d2c2a0"],["#12141a","#3d4a5c","#9a3d30","#c7b9a0"]],
+  psych:[["#2d0b4e","#ff4f9a","#ffd23f","#3bceac"],["#3a0c0c","#ff7b00","#ffd000","#7b2cbf"],["#06283d","#ff5e78","#ffe156","#47b5ff"],["#1d0a36","#f72585","#4cc9f0","#b5e48c"]],
+  space:[["#05060f","#1b2a6b","#7aa2ff","#f2e9e4"],["#07040f","#3c1c5e","#e4a5ff","#ffe8c2"],["#020814","#0f4c5c","#6fffe9","#e0e1dd"],["#0b0710","#5a1f2e","#ff9e7a","#f6e7d8"]],
+  heavy:[["#0a0a0a","#2b2b2b","#c1121f","#e5e5e5"],["#080808","#1f2a2e","#d4a017","#d9d9d9"],["#0b0b0d","#262433","#7f5af0","#efefef"],["#090909","#2e1f1a","#e85d04","#e8e2d6"]],
+  soft:[["#2b1d2e","#d98e73","#f2c48d","#fbeee0"],["#1f2a33","#8fb8c9","#f0c987","#faf3e3"],["#2a2420","#c47f5e","#e9b872","#f7ecd9"],["#232031","#a28fc0","#f3b391","#fdf0e6"]],
+  funk:[["#1a0b05","#ff3d00","#ffb300","#00b4d8"],["#13071f","#ff006e","#ffbe0b","#3a86ff"],["#0d1b12","#ff5400","#ffd60a","#06d6a0"]],
+  brit:[["#f1ede4","#1d3557","#e63946","#f4a261"],["#efe9dd","#264653","#e76f51","#2a9d8f"],["#f4efe6","#22223b","#c9184a","#ffb703"],["#eae6dc","#3d405b","#e07a5f","#81b29a"]]
+};
+function genreOf(a){ const n=norm(a); for (const g in GENRE) if (GENRE[g].includes(n)) return g; return ["grunge","space","heavy","brit","psych","soft"][hash(n)%6]; }
+function art(a,t){
+  const seed = hash(norm(a)+"|"+norm(t)), r = rng(seed), g = genreOf(a);
+  const P = GPAL[g][Math.floor(r()*GPAL[g].length)];
+  const id = "a"+seed.toString(36), pick = () => P[1+Math.floor(r()*3)];
+  let d = "", body = "";
+  const grain = (op,freq) => `<filter id="${id}n"><feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="3" seed="${seed%997}"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 ${op} 0"/></filter>`;
+  if (g==="grunge"){
+    d += grain(.55,.9) + `<filter id="${id}b"><feGaussianBlur stdDeviation="${4+r()*5}"/></filter>`;
+    body += `<rect width="100" height="100" fill="${P[0]}"/>`;
+    for (let i=0;i<5;i++) body += `<circle cx="${r()*100}" cy="${r()*100}" r="${15+r()*30}" fill="${pick()}" opacity="${.35+r()*.35}" filter="url(#${id}b)"/>`;
+    if (r()<.5){ body += `<circle cx="${20+r()*60}" cy="${15+r()*45}" r="${14+r()*14}" fill="${P[2]}" opacity=".9" filter="url(#${id}b)"/><circle cx="${20+r()*60}" cy="${15+r()*45}" r="${5+r()*7}" fill="${P[3]}" opacity=".85"/>`; }
+    else { for (let i=0;i<5+Math.floor(r()*5);i++){ const x=r()*100, w=2+r()*7, h=20+r()*60; body += `<rect x="${x}" y="-2" width="${w}" height="${h}" rx="${w/2}" fill="${i%2?P[2]:P[3]}" opacity="${.55+r()*.4}"/>`; } }
+    const fy = 30+r()*40; let p = `M-5 ${fy}`; for (let x=0;x<=105;x+=7) p += ` L${x} ${fy+(r()*14-7)}`;
+    body += `<path d="${p} L105 105 L-5 105Z" fill="${P[0]}" opacity=".75"/>`;
+    for (let i=0;i<14;i++){ const x=r()*100, y=r()*100, l=6+r()*22, an=r()*Math.PI; body += `<line x1="${x}" y1="${y}" x2="${(x+Math.cos(an)*l).toFixed(1)}" y2="${(y+Math.sin(an)*l).toFixed(1)}" stroke="${P[3]}" stroke-width="${.3+r()*.7}" opacity="${.25+r()*.4}"/>`; }
+    body += `<rect width="100" height="100" filter="url(#${id}n)"/>`;
+  } else if (g==="psych"){
+    body += `<rect width="100" height="100" fill="${P[0]}"/>`;
+    const cx=10+r()*80, cy=10+r()*80, tw=.2+r()*1.4, lobes=2+Math.floor(r()*6), step=6+r()*5, amp=2+r()*5, order=[P[1],P[2],P[3],P[0]].sort(()=>r()-.5);
+    for (let i=18;i>0;i--){ const rad=i*step; let p=""; for (let k=0;k<=60;k++){ const an=k/60*Math.PI*2, rr=rad+Math.sin(an*lobes+i*tw)*amp; p+=(k?"L":"M")+(cx+Math.cos(an+i*tw*.3)*rr).toFixed(1)+" "+(cy+Math.sin(an+i*tw*.3)*rr).toFixed(1); }
+      body += `<path d="${p}Z" fill="${order[i%4]}"/>`; }
+    d += grain(.18,1.2); body += `<rect width="100" height="100" filter="url(#${id}n)"/>`;
+  } else if (g==="space"){
+    d += `<radialGradient id="${id}s" cx="${20+r()*60}%" cy="${20+r()*40}%" r="80%"><stop offset="0" stop-color="${P[1]}"/><stop offset="1" stop-color="${P[0]}"/></radialGradient>` + grain(.2,1.4);
+    body += `<rect width="100" height="100" fill="url(#${id}s)"/>`;
+    for (let i=0;i<70;i++) body += `<circle cx="${(r()*100).toFixed(1)}" cy="${(r()*100).toFixed(1)}" r="${(r()*r()*.9+.1).toFixed(2)}" fill="${P[3]}" opacity="${(.4+r()*.6).toFixed(2)}"/>`;
+    const px=20+r()*60, py=35+r()*40, pr=10+r()*18, tilt=r()*40-20;
+    body += `<ellipse cx="${px}" cy="${py}" rx="${pr*2}" ry="${pr*.45}" fill="none" stroke="${P[2]}" stroke-width=".7" opacity=".6" transform="rotate(${tilt} ${px} ${py})"/>`;
+    body += `<circle cx="${px}" cy="${py}" r="${pr}" fill="${P[2]}"/><circle cx="${px-pr*.35}" cy="${py-pr*.35}" r="${pr}" fill="${P[0]}" opacity=".45"/>`;
+    body += `<rect width="100" height="100" filter="url(#${id}n)"/>`;
+  } else if (g==="heavy"){
+    body += `<rect width="100" height="100" fill="${P[0]}"/>`;
+    const cx=50+(r()*30-15), cy=50+(r()*30-15);
+    for (let i=0;i<9;i++){ const a1=r()*Math.PI*2, a2=a1+.15+r()*.35, R=90; body += `<path d="M${cx} ${cy} L${(cx+Math.cos(a1)*R).toFixed(1)} ${(cy+Math.sin(a1)*R).toFixed(1)} L${(cx+Math.cos(a2)*R).toFixed(1)} ${(cy+Math.sin(a2)*R).toFixed(1)}Z" fill="${i%3?P[1]:P[2]}" opacity="${.5+r()*.5}"/>`; }
+    let bolt = `M${cx} ${-5}`, x = cx; for (let y=8;y<=105;y+=10){ x += r()*16-8; bolt += ` L${x.toFixed(1)} ${y}`; }
+    body += `<path d="${bolt}" fill="none" stroke="${P[3]}" stroke-width="1.6" opacity=".9"/><circle cx="${cx}" cy="${cy}" r="${3+r()*4}" fill="${P[3]}"/>`;
+    d += grain(.35,1.1); body += `<rect width="100" height="100" filter="url(#${id}n)"/>`;
+  } else if (g==="soft"){
+    d += `<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P[0]}"/><stop offset=".65" stop-color="${P[1]}"/><stop offset="1" stop-color="${P[2]}"/></linearGradient>` + grain(.22,.8);
+    body += `<rect width="100" height="100" fill="url(#${id}g)"/><circle cx="${25+r()*50}" cy="${40+r()*20}" r="${10+r()*10}" fill="${P[3]}" opacity=".9"/>`;
+    for (let i=0;i<4;i++){ const base=60+i*11; let p=`M-5 105 L-5 ${base}`; for (let x=0;x<=105;x+=10) p+=` Q${x+5} ${(base-6-r()*10).toFixed(1)} ${x+10} ${(base+r()*4).toFixed(1)}`; body += `<path d="${p} L105 105Z" fill="${P[0]}" opacity="${.35+i*.18}"/>`; }
+    body += `<rect width="100" height="100" filter="url(#${id}n)"/>`;
+  } else if (g==="funk"){
+    body += `<rect width="100" height="100" fill="${P[0]}"/>`;
+    const ang = r()*60-30;
+    let s=""; for (let i=-4;i<10;i++) s += `<rect x="-50" y="${i*14}" width="200" height="${6+r()*6}" fill="${[P[1],P[2],P[3]][((i%3)+3)%3]}"/>`;
+    body += `<g transform="rotate(${ang} 50 50)">${s}</g><circle cx="${30+r()*40}" cy="${30+r()*40}" r="${16+r()*14}" fill="${P[0]}"/><circle cx="${30+r()*40}" cy="${30+r()*40}" r="${6+r()*8}" fill="${P[2]}"/>`;
+    d += grain(.2,1); body += `<rect width="100" height="100" filter="url(#${id}n)"/>`;
+  } else { // brit: bauhaus shapes on paper
+    body += `<rect width="100" height="100" fill="${P[0]}"/>`;
+    const n = 3+Math.floor(r()*3);
+    for (let i=0;i<n;i++){ const k=r(), x=r()*80, y=r()*80, s=18+r()*30, c=pick();
+      if (k<.35) body += `<circle cx="${x+s/2}" cy="${y+s/2}" r="${s/2}" fill="${c}"/>`;
+      else if (k<.65) body += `<rect x="${x}" y="${y}" width="${s}" height="${s*(.4+r()*.8)}" fill="${c}"/>`;
+      else body += `<path d="M${x} ${y+s} L${x+s/2} ${y} L${x+s} ${y+s}Z" fill="${c}"/>`; }
+    body += `<line x1="${r()*20}" y1="${80+r()*12}" x2="${80+r()*20}" y2="${80+r()*12}" stroke="${P[1]}" stroke-width="1.4"/>`;
+    d += grain(.12,1.3); body += `<rect width="100" height="100" filter="url(#${id}n)"/>`;
+  }
+  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>${d}</defs>${body}</svg>`;
+}
+function labelColor(a,t){ const r=rng(hash(norm(t)+norm(a))); return PALS[Math.floor(r()*PALS.length)][1]; }
+function sleeve(it, withText){
+  return `<div class="sl"${it.photo?"":` data-cov="${esc(coverKey(it.a,it.t))}" data-a="${esc(it.a)}" data-t="${esc(it.t)}"`}>${it.photo?`<img src="${it.photo}" alt="">`:art(it.a,it.t)}<div class="gloss"></div>${withText&&!it.photo?`<div class="txt"><div class="ta">${esc(it.a)}</div><div class="tt">${esc(it.t)}</div></div>`:""}</div>`;
+}
+
+const COVER_CACHE = {};
+const coverKey = (a,t) => norm(a) + "|" + norm(t);
+
+const artBox = (a,t) => {
+  const key = coverKey(a,t);
+  const cached = COVER_CACHE[key];
+  const imgTag = cached ? `<img src="${esc(cached)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1">` : "";
+  return `<div class="art" data-cov="${esc(key)}" data-a="${esc(a)}" data-t="${esc(t)}">${art(a,t)}${imgTag}</div>`;
+};
+
+function applyCover(key, url){
+  if (!url) return;
+  COVER_CACHE[key] = url;
+  try{ localStorage.setItem("vinylCoversV5", JSON.stringify(COVER_CACHE)); }catch(e){}
+  document.querySelectorAll(".sl[data-cov]").forEach(box => {
+    if (box.dataset.cov === key && !box.querySelector("img")){
+      const img = document.createElement("img");
+      img.src = url;
+      img.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1";
+      img.onerror = () => {
+        img.remove();
+        delete COVER_CACHE[key];
+        try{ localStorage.setItem("vinylCoversV5", JSON.stringify(COVER_CACHE)); }catch(e){}
+      };
+      box.appendChild(img);
+    }
+  });
+}
+
+try{
+  ["vinylCoversV1","vinylCoversV2","vinylCoversV3","vinylCoversV4"].forEach(k => localStorage.removeItem(k));
+  const savedCov = JSON.parse(localStorage.getItem("vinylCoversV5") || "{}");
+  Object.assign(COVER_CACHE, savedCov);
+}catch(e){}
+
+function jsonp(urlBuilder){
+  return new Promise(resolve => {
+    const cb = "__cb_" + Math.random().toString(36).slice(2);
+    const s = document.createElement("script");
+    const timer = setTimeout(() => { cleanup(); resolve(null); }, 6000);
+    function cleanup(){
+      clearTimeout(timer);
+      delete window[cb];
+      if (s.parentNode) s.parentNode.removeChild(s);
+    }
+    window[cb] = data => { cleanup(); resolve(data); };
+    s.onerror = () => { cleanup(); resolve(null); };
+    s.src = urlBuilder(cb);
+    document.head.appendChild(s);
+  });
+}
+
+function isBadTitle(text){
+  return /tribute|karaoke|made famous|cover band|instrumental version|lullaby|vitamin string|piano tribute|8-bit|in the style of/i.test(text);
+}
+
+const relaxT = s => norm(s).replace(/\b(mtv|live|the|remastered|remaster|edition|deluxe|version)\b/g," ").replace(/\s+/g," ").trim();
+function scoreMatch(candArtist, candAlbum, targetArtist, targetAlbum, trackCount, sourceBonus){
+  if (isBadTitle(candArtist + " " + candAlbum)) return -100;
+  const na = norm(targetArtist), nt = norm(targetAlbum);
+  const ra = norm(candArtist), rc = norm(candAlbum);
+  const stripped = candAlbum.replace(/\s*[\(\[]\s*(remaster(ed)?|deluxe|super deluxe|edition|anniversary|legacy|expanded|bonus|reissue|mono|stereo|\d{4}\s*remaster(ed)?)[^\)\]]*[\)\]]/gi, "").trim();
+  const rcClean = norm(stripped);
+
+  let score = sourceBonus || 0;
+  if (ra === na) score += 60;
+  else if (ra.includes(na) || na.includes(ra)) score += 35;
+  else return -100;
+
+  if (rc === nt) score += 80;
+  else if (rcClean === nt) score += 70;
+  else if (rc.startsWith(nt + " ") || rcClean.startsWith(nt + " ")) score += 10;
+  else if (nt.length >= 3 && (rc.includes(nt) || rcClean.includes(nt))) score += 20;
+  else if (relaxT(candAlbum) && relaxT(candAlbum) === relaxT(targetAlbum)) score += 60;
+  else return -100;
+
+  // Prefer standard studio album track counts (typically 6-18 tracks) over massive box sets (30+ tracks) or 1-3 track singles
+  if (trackCount){
+    if (trackCount >= 6 && trackCount <= 22) score += 15;
+    else if (trackCount > 25) score -= 25;
+    else if (trackCount <= 3) score -= 30;
+  }
+
+  // Penalize alternate editions (box sets, super deluxe, remixes, live, demos) that often have non-original covers
+  const lowAlbum = candAlbum.toLowerCase();
+  const lowTarget = targetAlbum.toLowerCase();
+  const altFlags = ["super deluxe", "box set", "deluxe", "remix", "anniversary", "collector", "expanded", "live", "single", "ep", "demo", "commentary"];
+  for (const flag of altFlags){
+    if (lowAlbum.includes(flag) && !lowTarget.includes(flag) && !(flag==="live" && /unplugged|live|mtv|concert/.test(lowTarget))){
+      score -= (flag === "super deluxe" || flag === "box set" || flag === "remix" || flag === "live") ? 45 : 25;
+    }
+  }
+
+  return score;
+}
+
+async function gatherCandidates(a, t){
+  const cleanT = t.replace(/\s*\([^)]*\)\s*/g, " ").trim() || t;
+  const candidates = [];
+
+  const [dz1, it1, it2] = await Promise.all([
+    jsonp(cb => `https://api.deezer.com/search/album?q=${encodeURIComponent(`artist:"${a}" album:"${cleanT}"`)}&limit=12&output=jsonp&callback=${cb}`),
+    jsonp(cb => `https://itunes.apple.com/search?term=${encodeURIComponent(`${a} ${cleanT}`)}&entity=album&limit=15&callback=${cb}`),
+    cleanT.length <= 4
+      ? jsonp(cb => `https://itunes.apple.com/search?term=${encodeURIComponent(cleanT)}&entity=album&attribute=albumTerm&limit=15&callback=${cb}`)
+      : Promise.resolve(null)
+  ]);
+
+  if (dz1 && dz1.data){
+    for (const item of dz1.data){
+      const url = item.cover_big || item.cover_medium;
+      if (!url) continue;
+      const sc = scoreMatch(item.artist && item.artist.name || "", item.title || "", a, cleanT, item.nb_tracks, 4);
+      if (sc > 0) candidates.push({ url, sc });
+    }
+  }
+
+  for (const res of [it1, it2]){
+    if (res && res.results){
+      for (const item of res.results){
+        if (!item.artworkUrl100) continue;
+        const url = item.artworkUrl100.replace("100x100bb", "500x500bb");
+        const sc = scoreMatch(item.artistName || "", item.collectionName || "", a, cleanT, item.trackCount, 6);
+        if (sc > 0) candidates.push({ url, sc });
+      }
+    }
+  }
+
+  if (!candidates.length){
+    const dzFallback = await jsonp(cb => `https://api.deezer.com/search/album?q=${encodeURIComponent(`${a} ${cleanT}`)}&limit=10&output=jsonp&callback=${cb}`);
+    if (dzFallback && dzFallback.data){
+      for (const item of dzFallback.data){
+        const url = item.cover_big || item.cover_medium;
+        if (!url) continue;
+        const sc = scoreMatch(item.artist && item.artist.name || "", item.title || "", a, cleanT, item.nb_tracks, 0);
+        if (sc > 0) candidates.push({ url, sc });
+      }
+    }
+  }
+
+  if (!candidates.length && relaxT(cleanT) !== norm(cleanT)){
+    const it3 = await jsonp(cb => `https://itunes.apple.com/search?term=${encodeURIComponent(`${a} ${relaxT(cleanT)}`)}&entity=album&limit=15&callback=${cb}`);
+    if (it3 && it3.results) for (const item of it3.results){
+      if (!item.artworkUrl100) continue;
+      const sc = scoreMatch(item.artistName || "", item.collectionName || "", a, cleanT, item.trackCount, 6);
+      if (sc > 0) candidates.push({ url: item.artworkUrl100.replace("100x100bb", "500x500bb"), sc });
+    }
+  }
+  candidates.sort((x, y) => y.sc - x.sc);
+  return candidates.length ? candidates[0].url : null;
+}
+
+const INFLIGHT = new Set();
+async function loadCovers(){
+  const els = Array.from(document.querySelectorAll(".sl[data-cov]"));
+  const tasks = [];
+  for (const el of els){
+    const key = el.dataset.cov;
+    if (COVER_CACHE[key]){
+      applyCover(key, COVER_CACHE[key]);
+      continue;
+    }
+    if (INFLIGHT.has(key)) continue;
+    INFLIGHT.add(key);
+    tasks.push({ key, a: el.dataset.a, t: el.dataset.t });
+  }
+  for (const item of tasks){
+    const url = await gatherCandidates(item.a, item.t);
+    INFLIGHT.delete(item.key);
+    if (url) applyCover(item.key, url);
+    await new Promise(r => setTimeout(r, 80));
+  }
+}
+
+
+
+/* ---------- tracklists (song names from Apple / Deezer, loaded in the browser) ---------- */
+const TRACKS = {};
+try{ Object.assign(TRACKS, JSON.parse(localStorage.getItem("vinylTracksV1")||"{}")); }catch(e){}
+const fmt = ms => { if(!ms) return ""; const s=Math.round(ms/1000); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); };
+async function fetchTracks(a,t){
+  const key = coverKey(a,t); if (TRACKS[key]) return TRACKS[key];
+  const cleanT = t.replace(/\s*\([^)]*\)\s*/g," ").trim() || t;
+  let out = null;
+  let best = null;
+  for (const term of [a+" "+cleanT, a+" "+relaxT(cleanT)]){
+    const it = await jsonp(cb=>`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=15&callback=${cb}`);
+    if (it && it.results) for (const r of it.results){ const sc = scoreMatch(r.artistName||"", r.collectionName||"", a, cleanT, r.trackCount, 6); if (sc>0 && (!best || sc>best.sc)) best = {id:r.collectionId, sc}; }
+    if (best || relaxT(cleanT)===norm(cleanT)) break;
+  }
+  if (best){
+    const lk = await jsonp(cb=>`https://itunes.apple.com/lookup?id=${best.id}&entity=song&limit=200&callback=${cb}`);
+    if (lk && lk.results){
+      const tr = lk.results.filter(r=>r.wrapperType==="track").sort((x,y)=>(x.discNumber-y.discNumber)||(x.trackNumber-y.trackNumber));
+      if (tr.length) out = tr.map(r=>({d:r.discNumber||1, n:r.trackNumber, name:r.trackName, ms:r.trackTimeMillis}));
+    }
+  }
+  if (!out){
+    const dz = await jsonp(cb=>`https://api.deezer.com/search/album?q=${encodeURIComponent(`artist:"${a}" album:"${cleanT}"`)}&limit=12&output=jsonp&callback=${cb}`);
+    let b2 = null;
+    if (dz && dz.data) for (const r of dz.data){ const sc = scoreMatch(r.artist&&r.artist.name||"", r.title||"", a, cleanT, r.nb_tracks, 4); if (sc>0 && (!b2 || sc>b2.sc)) b2 = {id:r.id, sc}; }
+    if (b2){
+      const tr = await jsonp(cb=>`https://api.deezer.com/album/${b2.id}/tracks?limit=200&output=jsonp&callback=${cb}`);
+      if (tr && tr.data && tr.data.length) out = tr.data.map((r,i)=>({d:r.disk_number||1, n:r.track_position||i+1, name:r.title, ms:(r.duration||0)*1000}));
+    }
+  }
+  if (out){ TRACKS[key] = out; try{ localStorage.setItem("vinylTracksV1", JSON.stringify(TRACKS)); }catch(e){} }
+  return out;
+}
+function tracksHTML(tr){
+  const discs = new Set(tr.map(x=>x.d)).size > 1;
+  let last = null, h = "";
+  for (const x of tr){ if (discs && x.d!==last){ h += `<li class="disc-h">Disc ${x.d}</li>`; last = x.d; }
+    h += `<li><span class="tn">${x.n}</span><span class="tt2">${esc(x.name)}</span><span class="td">${fmt(x.ms)}</span></li>`; }
+  const total = tr.reduce((s,x)=>s+(x.ms||0),0);
+  return `<div class="tlh">🎵 ${tr.length} songs${total?` · ${Math.round(total/60000)} min`:""}</div><ol class="tl">${h}</ol>`;
+}
+async function showTracks(a,t){
+  const box = $("#tracks"); if (!box) return;
+  const want = coverKey(a,t); box.dataset.k = want;
+  if (!TRACKS[want]) box.innerHTML = `<div class="tlh"><span class="spin"></span>Loading songs…</div>`;
+  const tr = await fetchTracks(a,t);
+  if (!$("#tracks") || $("#tracks").dataset.k !== want) return;
+  $("#tracks").innerHTML = tr ? tracksHTML(tr) : `<div class="tlh">Couldn't find the song list for this one. Try Spotify.</div>`;
+}
+
+
+/* ---------- pick the right cover when the automatic match is wrong ---------- */
+async function coverOptions(a,t){
+  const cleanT = t.replace(/\s*\([^)]*\)\s*/g," ").trim() || t, na = norm(a), out = [], seen = new Set();
+  const push = (artist, album, thumb, big) => {
+    const ra = norm(artist); if (!(ra===na || ra.includes(na) || na.includes(ra))) return;
+    if (isBadTitle(artist+" "+album) || seen.has(big)) return; seen.add(big);
+    const close = relaxT(album).includes(relaxT(cleanT)) || relaxT(cleanT).includes(relaxT(album));
+    out.push({album, thumb, big, close});
+  };
+  const [it1, it2, dz] = await Promise.all([
+    jsonp(cb=>`https://itunes.apple.com/search?term=${encodeURIComponent(a+" "+cleanT)}&entity=album&limit=25&callback=${cb}`),
+    jsonp(cb=>`https://itunes.apple.com/search?term=${encodeURIComponent(a)}&entity=album&attribute=artistTerm&limit=60&callback=${cb}`),
+    jsonp(cb=>`https://api.deezer.com/search/album?q=${encodeURIComponent(a+" "+cleanT)}&limit=25&output=jsonp&callback=${cb}`)
+  ]);
+  for (const res of [it1, it2]) if (res && res.results) for (const r of res.results)
+    if (r.artworkUrl100) push(r.artistName||"", r.collectionName||"", r.artworkUrl100, r.artworkUrl100.replace("100x100bb","500x500bb"));
+  if (dz && dz.data) for (const r of dz.data) if (r.cover_big) push(r.artist&&r.artist.name||"", r.title||"", r.cover_medium||r.cover_big, r.cover_big);
+  out.sort((x,y)=> (y.close-x.close));
+  return out.slice(0,18);
+}
+function setCover(key, url){
+  COVER_CACHE[key] = url;
+  try{ localStorage.setItem("vinylCoversV5", JSON.stringify(COVER_CACHE)); }catch(e){}
+  document.querySelectorAll(".sl[data-cov]").forEach(box=>{ if (box.dataset.cov===key){ const im = box.querySelector("img"); if (im) im.src = url; } });
+  applyCover(key, url);
+}
+async function showCoverPicker(a,t){
+  const box = $("#covpick"); if (!box) return;
+  box.innerHTML = `<div class="tlh"><span class="spin"></span>Looking for covers…</div>`;
+  const opts = await coverOptions(a,t);
+  if (!$("#covpick")) return;
+  $("#covpick").innerHTML = opts.length
+    ? `<div class="tlh">Tap the right one:</div><div class="cgrid">${opts.map(o=>`<button class="copt" data-big="${esc(o.big)}" data-key="${esc(coverKey(a,t))}" title="${esc(o.album)}"><img src="${esc(o.thumb)}" alt=""><span>${esc(o.album)}</span></button>`).join("")}</div>`
+    : `<div class="tlh">Couldn't find other covers for this one.</div>`;
+}
+
+
+/* ---------- shared sync (you + dad), stored in a private ExtendsClass bin ---------- */
+const SYNC_URL = "https://extendsclass.com/api/json-storage/bin/";
+let SYNC = null, pushTimer = null, lastRemoteAt = 0, syncing = false;
+function hashSync(){ const m = location.hash.match(/k=([A-Za-z0-9]+)\.([A-Za-z0-9]+)/); return m ? {id:m[1], key:m[2]} : null; }
+SYNC = hashSync();
+if (!SYNC){ try{ SYNC = JSON.parse(localStorage.getItem("vinylSync")||"null"); }catch(e){} }
+if (SYNC){ try{ localStorage.setItem("vinylSync", JSON.stringify(SYNC)); }catch(e){}
+  if (!hashSync()) try{ history.replaceState(null, "", "#k="+SYNC.id+"."+SYNC.key); }catch(e){} }
+const setSync = t => { const el = $("#syncState"); if (el) el.textContent = t; };
+const cleanJSON = t => JSON.parse(t.split(/<!doctype/i)[0].trim());
+const ago = ts => { const s = Math.round((Date.now()-ts)/1000); return s<60 ? "just now" : s<3600 ? Math.round(s/60)+" min ago" : new Date(ts).toLocaleString(); };
+function forCloud(st){ const c = JSON.parse(JSON.stringify(st)); for (const l of ["wish","have","picks"]) (c[l]||[]).forEach(x=>delete x.photo); return c; }
+function merge(local, remote){
+  const del = Object.assign({}, remote.deleted||{}, local.deleted||{});
+  const ids = new Set(); ["wish","have","picks"].forEach(l=>(local[l]||[]).forEach(x=>ids.add(x.id)));
+  ["wish","have","picks"].forEach(l=>{ local[l] = (local[l]||[]).filter(x=>!(remote.deleted||{})[x.id]);
+    (remote[l]||[]).forEach(x=>{ if (!ids.has(x.id) && !del[x.id]) { local[l].push(x); ids.add(x.id); } }); });
+  local.deleted = del; return local;
+}
+async function getRemote(){
+  const r = await fetch(SYNC_URL+SYNC.id, {headers:{"Security-key":SYNC.key}, cache:"no-store"});
+  if (!r.ok) throw new Error("get "+r.status);
+  return cleanJSON(await r.text());
+}
+async function pull(){
+  if (!SYNC || syncing) return; syncing = true;
+  try{
+    const remote = await getRemote();
+    if (remote && remote.wish){
+      const ra = remote.savedAt||0;
+      if (ra > (S.savedAt||0)){ S = remote; S.picks = S.picks||[]; try{ localStorage.setItem("vinylRoomV3", JSON.stringify(S)); }catch(e){} closeModal(); render(); }
+      else if ((S.savedAt||0) > ra) schedulePush(0);
+      lastRemoteAt = ra;
+    }
+    setSync("🔄 Shared · synced " + ago(Date.now()));
+  }catch(e){ setSync("⚠️ Offline, will sync later"); }
+  syncing = false;
+}
+function schedulePush(delay){
+  if (!SYNC) return; clearTimeout(pushTimer);
+  setSync("🔄 Saving…");
+  pushTimer = setTimeout(push, delay==null ? 1200 : delay);
+}
+async function push(){
+  if (!SYNC) return;
+  if (syncing){ schedulePush(800); return; } syncing = true;
+  try{
+    let remote = null; try{ remote = await getRemote(); }catch(e){}
+    if (remote && remote.wish && (remote.savedAt||0) > lastRemoteAt){ S = merge(S, remote); S.savedAt = Date.now(); try{ localStorage.setItem("vinylRoomV3", JSON.stringify(S)); }catch(e){} render(); }
+    const body = JSON.stringify(forCloud(S));
+    const r = await fetch(SYNC_URL+SYNC.id, {method:"PUT", headers:{"Content-Type":"application/json","Security-key":SYNC.key}, body});
+    if (!r.ok) throw new Error("put "+r.status);
+    lastRemoteAt = S.savedAt||0;
+    setSync("🔄 Shared · synced " + ago(Date.now()));
+  }catch(e){ setSync("⚠️ Couldn't sync, will retry"); setTimeout(()=>schedulePush(0), 20000); }
+  syncing = false;
+}
+async function createShared(){
+  try{
+    const key = Array.from(crypto.getRandomValues(new Uint8Array(12))).map(b=>b.toString(36)).join("").slice(0,20);
+    S.savedAt = S.savedAt || Date.now();
+    const r = await fetch(SYNC_URL, {method:"POST", headers:{"Content-Type":"application/json","Security-key":key,"Private":"true"}, body:JSON.stringify(forCloud(S))});
+    const j = cleanJSON(await r.text()); if (!j.id) throw 0;
+    SYNC = {id:j.id, key}; try{ localStorage.setItem("vinylSync", JSON.stringify(SYNC)); }catch(e){}
+    history.replaceState(null, "", "#k="+SYNC.id+"."+SYNC.key); lastRemoteAt = S.savedAt;
+    syncUI(); setSync("🔄 Shared · synced just now"); toast("Shared list created. Copy the link and send it to Dad");
+  }catch(e){ toast("Couldn't create the shared list"); }
+}
+function syncUI(){
+  const box = $("#syncBox"); if (!box) return;
+  box.innerHTML = SYNC
+    ? `<span id="syncState" class="sst">🔄 Shared</span><button class="dl" id="shareBtn">🔗 Copy link for Dad</button>`
+    : `<button class="dl" id="mkShare">🔗 Create shared list</button>`;
+  const sb = $("#shareBtn"); if (sb) sb.onclick = async ()=>{ try{ await navigator.clipboard.writeText(location.href); toast("Link copied. Send it to Dad"); }catch(e){ prompt("Copy this link:", location.href); } };
+  const mk = $("#mkShare"); if (mk) mk.onclick = createShared;
+}
+document.addEventListener("visibilitychange", ()=>{ if (document.visibilityState==="visible") pull(); });
+window.addEventListener("focus", ()=>pull());
+setInterval(()=>{ if (document.visibilityState==="visible") pull(); }, 45000);
+
+/* ---------- saving ---------- */
+let NS = null, saveTimer = null, readOnly = false;
+const setSave = t => $("#saveState").textContent = t;
+function buildDoc(){
+  const st = JSON.stringify(S).replace(/<\//g,"<\\/");
+  const font = document.head.querySelector('link[href*="fonts.googleapis"]');
+  return '<!DOCTYPE html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
+    + "<title>Shahaf's Vinyl Shelf</title>" + (font?font.outerHTML:"")
+    + '<style id="css">' + $("#css").textContent + '<\/style></head><body><div id="shell">' + SHELL + '</div>'
+    + '<script id="state" type="application/json">' + st + '<\/script>'
+    + '<script id="app">' + $("#app").textContent + '<\/script></body></html>';
+}
+function save(){
+  S.savedAt = Date.now(); try{ localStorage.setItem("vinylRoomV3", JSON.stringify(S)); }catch(e){}
+  schedulePush();
+  if (readOnly) return;
+  if (!NS){ setSave(LOCAL ? "Saved on this device" : ""); return; }
+  setSave("Saving…"); clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{ await NS.publish(buildDoc()); setSave("Saved ✓"); }
+    catch(e){
+      if (e && (e.code==="not_granted"||e.code==="not_writer")){ readOnly=true; setSave("View-only"); }
+      else if (e && e.code==="conflict") setSave("Updated elsewhere");
+      else setSave("Saved on this device");
+    }
+  }, 1200);
+}
+(async ()=>{
+  try{ const c = window.claude && await window.claude.use("artifact"); if (c) NS = c; else { LOCAL = true; loadLocal(); } }
+  catch(e){ LOCAL = true; loadLocal(); }
+})();
+function loadLocal(){ try{ const l = JSON.parse(localStorage.getItem("vinylRoomV3")||"null"); if (l && l.wish && l.picks && (l.savedAt||0) > (S.savedAt||0)){ S = l; render(); } }catch(e){} }
+
+/* ---------- toast ---------- */
+let tt;
+function toast(msg, undo){
+  const t = $("#toast");
+  t.innerHTML = esc(msg) + (undo ? ' <button id="undo">Undo</button>' : "");
+  t.classList.add("show");
+  if (undo) $("#undo").onclick = ()=>{ undo(); t.classList.remove("show"); };
+  clearTimeout(tt); tt = setTimeout(()=>t.classList.remove("show"), 4500);
+}
+
+/* ---------- actions ---------- */
+function addTo(list,a,t,y,tier){
+  if (where(a,t)) { toast("Already on your shelf"); return false; }
+  const o={id:uid(),a,t,y:y?(Number(y)||y):""}; if(TIERED(list)) o.tier=tier||addTier; S[list].unshift(o); save(); render();
+  toast(TIERED(list) ? `“${t}” added to ${LISTNAME[list]} · ${TIERS.find(x=>x[0]===o.tier)[1]}` : `“${t}” added to your collection`);
+  return true;
+}
+function find(id){ for (const l of ["wish","picks","have"]){ const i=S[l].findIndex(x=>x.id===id); if(i>=0) return {l,i,it:S[l][i]}; } return null; }
+function remove(id){
+  const f = find(id); if (!f) return;
+  S[f.l].splice(f.i,1); S.deleted = S.deleted||{}; S.deleted[id] = Date.now(); save(); closeModal(); render();
+  toast(`Removed “${f.it.t}”`, ()=>{ S[f.l].splice(f.i,0,f.it); delete S.deleted[id]; save(); render(); });
+}
+function move(id){
+  const f = find(id); if (!f) return; const to = TIERED(f.l)?"have":"wish";
+  S[f.l].splice(f.i,1); if (to==="have") delete f.it.tier; else f.it.tier = f.it.tier||"good"; S[to].unshift(f.it); save(); closeModal(); render();
+  toast(to==="have" ? `“${f.it.t}” is on your shelf now 🎉` : `“${f.it.t}” back on the wishlist`, ()=>{
+    const j=S[to].findIndex(x=>x.id===id); if(j>=0) S[to].splice(j,1); S[f.l].splice(f.i,0,f.it); save(); render(); });
+}
+let photoFor = null;
+$("#photoInput").addEventListener("change", e=>{
+  const file = e.target.files[0]; e.target.value=""; if (file&&photoFor) setPic(file, photoFor);
+});
+function setPic(file, forId){
+  if (!file || !/^image\//.test(file.type)) { toast("That isn't a picture"); return; }
+  photoFor = forId;
+  const img = new Image(), url = URL.createObjectURL(file);
+  img.onload = ()=>{
+    const side=400, c=document.createElement("canvas"); c.width=c.height=side;
+    const s=Math.min(img.width,img.height); c.getContext("2d").drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,side,side);
+    URL.revokeObjectURL(url);
+    const f = find(photoFor); if (f){ f.it.photo = c.toDataURL("image/jpeg",.8); save(); render(); openModal(photoFor); toast("Picture added"); }
+  };
+  img.onerror = ()=>{ URL.revokeObjectURL(url); toast("Couldn't read that picture"); };
+  img.src = url;
+}
+let openId = null;
+document.addEventListener("paste", e=>{
+  if (!openId) return; const fl = [...(e.clipboardData&&e.clipboardData.files||[])].find(x=>/^image\//.test(x.type));
+  if (fl){ e.preventDefault(); setPic(fl, openId); }
+});
+
+/* ---------- modal: pull a record out ---------- */
+function openModal(id){
+  const f = find(id); if (!f) return; const it = f.it, qq = `${it.a} ${it.t}`;
+  const m = $("#modal");
+  openId = id;
+  const tierCtl = TIERED(f.l) ? `<div class="tiers" role="radiogroup" aria-label="Category">${TIERS.map(([k,l,i])=>`<button role="radio" aria-checked="${it.tier===k}" class="${it.tier===k?"on":""}" data-tier="${k}" data-id="${id}">${i} ${l}</button>`).join("")}</div>` : "";
+  m.innerHTML = `<div class="sheet" role="dialog" aria-label="${esc(it.t)}"><button class="x" data-close>✕</button>
+    <div class="pull"><div class="disc" style="--lab:${labelColor(it.a,it.t)}"></div>${sleeve(it,true)}</div>
+    <h3>${esc(it.t)}</h3><div class="by">${esc(it.a)}${it.y?" · "+esc(it.y):""}${f.l==="have"?" · on my shelf":""}</div>
+    ${tierCtl}
+    ${it.why?`<p class="why">${esc(it.why)}</p>`:""}
+    ${it.k&&it.k.length?`<p class="tr"><b>Drop the needle on:</b> ${it.k.map(esc).join(" · ")}</p>`:""}
+    <div class="acts">
+      ${TIERED(f.l)?`<button class="btn gold" data-move="${id}">✓ I own it</button>`:`<button class="btn" data-move="${id}">↩ Move to wishlist</button>`}
+      <a class="btn" href="https://open.spotify.com/search/${enc(qq)}" target="_blank" rel="noopener">♫ Spotify</a>
+      <button class="btn danger" data-del="${id}">✕ Remove</button>
+    </div>
+    ${it.photo?"":`<div class="covrow"><button class="linkbtn" data-pickcov="1">🔄 Wrong cover? Pick another</button></div><div id="covpick"></div>`}
+    <div id="tracks" class="tracks"></div>
+    </div>`;
+  m.classList.add("open"); m.setAttribute("aria-hidden","false"); loadCovers(); showTracks(it.a,it.t);
+}
+let prev = null;
+function openPreview(a,t,y){
+  prev = {a,t,y}; openId = null;
+  const w = where(a,t), qq = `${a} ${t}`, m = $("#modal");
+  m.innerHTML = `<div class="sheet" role="dialog" aria-label="${esc(t)}"><button class="x" data-close>✕</button>
+    <div class="pull"><div class="disc" style="--lab:${labelColor(a,t)}"></div>${sleeve({a,t},true)}</div>
+    <h3>${esc(t)}</h3><div class="by">${esc(a)}${y?" · "+esc(y):""}</div>
+    ${w ? `<p class="why">Already ${w==="have"?"in your collection":"on your wishlist"}.</p>` :
+      `<div class="tiers" role="radiogroup" aria-label="Category">${TIERS.map(([k,l,i])=>`<button role="radio" aria-checked="${addTier===k}" class="${addTier===k?"on":""}" data-ptier="${k}">${i} ${l}</button>`).join("")}</div>`}
+    <div class="acts">${w?"":`<button class="btn gold" data-padd="wish">♡ Add to wishlist</button><button class="btn" data-padd="have">◉ I own it</button>`}
+      <a class="btn" href="https://open.spotify.com/search/${enc(qq)}" target="_blank" rel="noopener">♫ Spotify</a></div>
+    <div id="tracks" class="tracks"></div></div>`;
+  m.classList.add("open"); m.setAttribute("aria-hidden","false"); loadCovers(); showTracks(a,t);
+}
+function closeModal(){ prev = null; openId = null; const m=$("#modal"); m.classList.remove("open"); m.setAttribute("aria-hidden","true"); m.innerHTML=""; }
+$("#modal").addEventListener("click", e=>{
+  const pc = e.target.closest("[data-pickcov]"); if (pc && openId){ const f = find(openId); if (f) showCoverPicker(f.it.a, f.it.t); return; }
+  const co = e.target.closest(".copt"); if (co){ setCover(co.dataset.key, co.dataset.big); $("#covpick").innerHTML = `<div class="tlh">Cover updated ✓</div>`; toast("Cover updated"); return; }
+  const pt = e.target.closest("[data-ptier]"); if (pt && prev){ addTier = pt.dataset.ptier; document.querySelectorAll("[data-ptier]").forEach(x=>{ x.classList.toggle("on", x===pt); x.setAttribute("aria-checked", x===pt); }); return; }
+  const pa = e.target.closest("[data-padd]"); if (pa && prev){ const {a,t,y} = prev; if (addTo(pa.dataset.padd,a,t,y,addTier)) closeModal(); return; }
+  if (e.target.id==="modal" || e.target.closest("[data-close]")) return closeModal();
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.move) move(b.dataset.move);
+  else if (b.dataset.del) remove(b.dataset.del);
+  else if (b.dataset.photo){ photoFor=b.dataset.photo; $("#photoInput").click(); }
+  else if (b.dataset.unpic){ const f=find(b.dataset.unpic); if(f){ delete f.it.photo; save(); render(); openModal(f.it.id); } }
+  else if (b.dataset.tier){ const f=find(b.dataset.id); if(f&&f.it.tier!==b.dataset.tier){ const old=f.it.tier; f.it.tier=b.dataset.tier; save(); render(); openModal(f.it.id);
+      toast(`Moved to ${TIERS.find(x=>x[0]===b.dataset.tier)[1]}`, ()=>{ f.it.tier=old; save(); render(); if(openId===f.it.id) openModal(f.it.id); }); } }
+});
+["dragover","drop"].forEach(ev=>document.addEventListener(ev, e=>{
+  const tgt = e.target.closest && (e.target.closest(".pull") || e.target.closest("[data-open]")); if (!tgt) return;
+  e.preventDefault(); if (ev!=="drop") return;
+  const fl = e.dataTransfer && [...e.dataTransfer.files].find(x=>/^image\//.test(x.type)); if (!fl) return;
+  setPic(fl, tgt.dataset.open || openId);
+}));
+document.addEventListener("keydown", e=>{ if (e.key==="Escape") closeModal(); });
+
+/* ---------- views ---------- */
+function slot(it, i){
+  const r = rng(hash(it.id)); const ry = (r()*16-8).toFixed(1), rz = (r()*4-2).toFixed(1);
+  return `<div class="slot" tabindex="0" data-open="${it.id}" style="--ry:${ry}deg;--rz:${rz}deg" title="${esc(it.a)} — ${esc(it.t)}">
+    <div class="disc" style="--lab:${labelColor(it.a,it.t)}"></div>${sleeve(it,false)}<div class="cap"><b>${esc(it.t)}</b><span>${esc(it.a)}</span></div></div>`;
+}
+function shelfView(list){
+  const items = S[list], f = norm(q);
+  const shown = f ? items.filter(x=>norm(x.a+" "+x.t).includes(f)) : items;
+  const label = list==="have" ? "My collection — tap to pull one out" : "Tap a record to pull it out";
+  const dbx = f ? dbSuggest(f, list) : "";
+  if (!items.length) return `<div class="unit"><div class="empty"><b>${list==="have"?"The shelf is empty":"Nothing here yet"}</b>
+    Search above to add albums, or open Find records.
+    <div style="margin-top:16px"><button class="btn gold" data-go="add">＋ Find records</button></div></div></div>` + dbx;
+  if (TIERED(list)){
+    if (f && !shown.length) return `<div class="unit"><div class="empty">Nothing on this shelf matches “${esc(q)}”.</div></div>` + dbx;
+    return TIERS.map(([k,l,i])=>{ const its = shown.filter(x=>x.tier===k); if (f && !its.length) return "";
+      return `<div class="unit"><div class="label"><span class="ti">${i}</span> ${l} <span class="lc">${its.length}</span></div>
+        ${its.length?`<div class="shelf">${its.map(slot).join("")}</div>`:`<div class="mt">Nothing here yet. Open a record and tap “${l}” to move it here.</div>`}</div>`; }).join("") + dbx;
+  }
+  return `<div class="unit"><div class="label">${label}${f?` · ${shown.length} match`:""}</div>
+    ${shown.length?`<div class="shelf">${shown.map(slot).join("")}</div>`:`<div class="empty">Nothing matches “${esc(q)}”.</div>`}</div>` + dbx;
+}
+function dbMatches(f){ const words=f.split(" ").filter(Boolean);
+  return CAT.filter(([a,t])=>{ const s=norm(a+" "+t); return words.every(w=>s.includes(w)); })
+    .sort((x,y)=> (norm(y[0]).startsWith(f)-norm(x[0]).startsWith(f)) || (x[2]-y[2])); }
+function dbSuggest(f, list){
+  const m = dbMatches(f).filter(([a,t])=>!where(a,t)).slice(0,8); if (!m.length) return "";
+  return `<div class="ph" style="font-size:18px">Add from the database</div><div class="panel">${tierPick()}${m.map(([a,t,y])=>resRow(a,t,y)).join("")}</div>`;
+}
+let addTier = "good";
+function tierPick(){ return `<div class="tp"><span>Add to:</span>${TIERS.map(([k,l,i])=>`<button class="chip ${addTier===k?"on":""}" data-tp="${k}">${i} ${l}</button>`).join("")}</div>`; }
+function resRow(a,t,y,sub){
+  return resRow0(a,t,y,sub).replace('<div class="res">', `<div class="res" data-prev="1" data-a="${esc(a)}" data-t="${esc(t)}" data-y="${esc(y)}" title="Tap to see the songs">`).replace('<div class="acts">','<div class="acts"><button class="btn" data-songs="1">🎵 Songs</button>');
+}
+function resRow0(a,t,y,sub){
+  const w = where(a,t), d = `data-a="${esc(a)}" data-t="${esc(t)}" data-y="${esc(y)}"`;
+  return `<div class="res">${sleeve({a,t},false)}<div class="meta"><b>${esc(t)}</b><span>${esc(a)}${y?" · "+esc(y):""}${sub?" · "+esc(sub):""}</span></div>
+    <div class="acts">${w?`<button class="btn" disabled>${w==="have"?"◉ Owned":w==="picks"?"♥ In my picks":"♡ On wishlist"}</button>`:`<button class="btn gold" data-add="wish" ${d}>♡ Wishlist</button><button class="btn" data-add="have" ${d}>◉ Own it</button>`}</div></div>`;
+}
+let ai = null, aiQ = "", aiBusy = false, aiErr = "";
+function findView(){
+  const f = norm(q);
+  const words = f.split(" ").filter(Boolean);
+  let local = [];
+  if (f){
+    local = dbMatches(f);
+  }
+  const artists = ["Alice in Chains","Soundgarden","Pink Floyd","Radiohead","Metallica","Led Zeppelin","Pearl Jam","Rainbow","Deftones","Mashina"];
+  let aiBlock = "";
+  if (f){
+    if (aiBusy) aiBlock = `<div class="hint"><span class="spin"></span>Looking through every album…</div>`;
+    else if (aiErr) aiBlock = `<div class="hint">${esc(aiErr)}</div>`;
+    else if (ai && aiQ===f) aiBlock = ai.length ? ai.map(x=>resRow(x.artist,x.title,x.year,x.type)).join("") : `<div class="hint">Nothing else found.</div>`;
+    else aiBlock = `<div class="hint"><button class="btn gold" id="aiGo">🔎 Search beyond the database</button></div>`;
+  }
+  return `<div class="ph">Find records <small>${CAT.length} albums in the crate</small></div>
+  <div class="panel">${tierPick()}${f ? (local.length ? local.slice(0,40).map(([a,t,y])=>resRow(a,t,y)).join("") + (local.length>40?`<div class="hint">+${local.length-40} more, so type more to narrow it down</div>`:"")
+      : `<div class="hint">Not in the crate.</div>`)
+    : `<div class="hint">Search an artist or album, like “in rainbows”, “sabbath” or “unplugged”. Or start with:</div><div class="chips">${artists.map(a=>`<button class="chip" data-q="${esc(a)}">${esc(a)}</button>`).join("")}</div>`}</div>
+  ${f?`<div class="ph" style="font-size:18px">Can't find it?</div><div class="panel">${aiBlock}</div>`:""}
+  <div class="ph" style="font-size:18px">Add one yourself</div>
+  <div class="panel"><form id="manual"><div class="row"><input name="t" placeholder="Album title" required><input name="a" placeholder="Artist" required><input name="y" placeholder="Year" inputmode="numeric"></div>
+  <div class="formacts"><button class="btn gold" type="submit" data-to="wish">♡ Add to wishlist</button><button class="btn" type="submit" data-to="have">◉ Add to my collection</button></div></form></div>`;
+}
+function render(){
+  document.querySelectorAll(".plate").forEach(b=>b.classList.toggle("on", b.dataset.tab===tab));
+  $("#filter").placeholder = tab==="add" ? "Search albums or artists…" : "Search this shelf or add new albums…";
+  $("#sWish").textContent = S.wish.length; $("#sHave").textContent = S.have.length;
+  $("#main").innerHTML = tab==="add" ? findView() : shelfView(tab);
+  const go = $("#aiGo"); if (go) go.onclick = aiSearch;
+  const m = $("#manual");
+  if (m) m.onsubmit = e=>{ e.preventDefault();
+    const to=(e.submitter&&e.submitter.dataset.to)||"wish", fd=new FormData(m), a=fd.get("a").trim(), t=fd.get("t").trim();
+    if (a&&t&&addTo(to,a,t,fd.get("y").trim())) m.reset(); };
+  loadCovers();
+}
+async function aiSearch(){
+  const f = norm(q); if (!f) return;
+  let sample = null; try{ sample = window.claude && await window.claude.use("sample"); }catch(e){}
+  if (!sample){ aiErr = "Wider search isn't available here. Add it yourself below."; render(); return; }
+  aiBusy = true; aiErr = ""; render();
+  const prompt = `You are a music catalog. Search: "${q}".\nReturn ONLY a JSON array of up to 10 real, officially released albums (studio, live, EP or compilation) matching the search by artist or album title. Never invent albums.\nEach item: {"artist":string,"title":string,"year":number,"type":"Studio"|"Live"|"EP"|"Compilation"}`;
+  try{
+    let r = sample.json ? await sample.json(prompt,{modelTier:"quick"}) : JSON.parse((await sample(prompt,{modelTier:"quick"})).text.replace(/^[^\[]*/,"").replace(/[^\]]*$/,""));
+    if (!Array.isArray(r)) r = (r&&(r.albums||r.results))||[];
+    ai = r.filter(x=>x&&x.artist&&x.title).slice(0,10); aiQ = f;
+  }catch(e){ aiErr = e&&e.code==="rate_limited" ? "Too many searches. Try again in a minute." : "That search didn't work. Add it yourself below."; }
+  aiBusy = false; render();
+}
+
+/* ---------- events ---------- */
+$("#tabs").addEventListener("click", e=>{ const b=e.target.closest(".plate"); if(!b) return; tab=b.dataset.tab; q=""; $("#filter").value=""; ai=null; aiErr=""; render(); });
+let ft; $("#filter").addEventListener("input", e=>{ q=e.target.value; aiErr=""; clearTimeout(ft); ft=setTimeout(render,140); });
+$("#filter").addEventListener("keydown", e=>{ if (e.key==="Enter"&&tab==="add"){ e.preventDefault(); e.target.blur(); } });
+$("#main").addEventListener("click", e=>{
+  const s = e.target.closest("[data-open]"); if (s) return openModal(s.dataset.open);
+  const b = e.target.closest("button");
+  const pr = e.target.closest(".res[data-prev]");
+  if (pr && (!b || b.dataset.songs)) return openPreview(pr.dataset.a, pr.dataset.t, pr.dataset.y);
+  if (!b) return;
+  if (b.dataset.go){ tab=b.dataset.go; render(); }
+  else if (b.dataset.q){ q=b.dataset.q; $("#filter").value=q; render(); }
+  else if (b.dataset.tp){ addTier=b.dataset.tp; render(); }
+  else if (b.dataset.add) addTo(b.dataset.add,b.dataset.a,b.dataset.t,b.dataset.y,addTier);
+});
+$("#main").addEventListener("keydown", e=>{ const s=e.target.closest("[data-open]"); if (s&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); openModal(s.dataset.open); } });
+/* ---------- save a copy (to move changes to another device) ---------- */
+$("#dlBtn") && $("#dlBtn").addEventListener("click", ()=>{
+  try{
+    S.savedAt = Date.now();
+    const blob = new Blob([buildDoc()], {type:"text/html"});
+    const url = URL.createObjectURL(blob), link = document.createElement("a");
+    link.href = url; link.download = "Shahaf_Record_Room.html"; document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    toast("Saved. Send this new file to your phone");
+  }catch(e){ toast("Couldn't save a copy here"); }
+});
+render();
+syncUI(); pull();
+})();
+</script></body></html>
